@@ -63,7 +63,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the command to execute when valid text changes after the debounce interval.
         /// </summary>
         /// <remarks>
-        /// Executed in response to <see cref="TextBoxBase.TextChanged"/> event after <see cref="DebounceInterval"/> milliseconds of inactivity.
+        /// Executed in response to <see cref="Control.TextChanged"/> event after <see cref="DebounceInterval"/> milliseconds of inactivity.
         /// This command fires only for text changes that conform to the mask (rejected characters do not trigger this command).
         /// Automatically synchronizes <see cref="Control.Enabled"/> based on <see cref="ICommand.CanExecute(object?)"/>,
         /// passing <see cref="TextCommandParameter"/> (or <see cref="TextBoxBase.Text"/> if <see cref="TextCommandParameter"/> is <see langword="null"/>).

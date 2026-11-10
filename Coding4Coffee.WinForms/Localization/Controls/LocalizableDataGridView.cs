@@ -28,8 +28,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
                     if (Columns.Contains(info.ColumnName))
                     {
                         var column = Columns[info.ColumnName];
-                        if (column != null)
-                            column.HeaderText = this.GetResourceManager()?.GetString(info.HeaderTextResourceKey) ?? column.HeaderText;
+                        column?.HeaderText = this.GetResourceManager()?.GetString(info.HeaderTextResourceKey) ?? column.HeaderText;
                     }
                 }
             }

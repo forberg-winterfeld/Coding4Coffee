@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using Coding4Coffee.Basics.Localization;
 
 namespace Coding4Coffee.WinForms.Localization.Controls
@@ -23,9 +24,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         private void LocalizationManager_CultureChanged(object? sender, EventArgs e)
         {
             if (Created && !IsDisposed)
-            {
                 Localize();
-            }
         }
 
         /// <summary>
@@ -35,9 +34,8 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-            {
                 LocalizationManager.CultureChanged -= LocalizationManager_CultureChanged;
-            }
+            
             base.Dispose(disposing);
         }
 
@@ -55,6 +53,8 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         /// </summary>
         public void Localize()
         {
+            Debug.WriteLine($"Localizing form: {Name}, TextResourceKey: {TextResourceKey}, CurrentCulture: {LocalizationManager.CurrentCulture?.Name}");
+
             if (!string.IsNullOrWhiteSpace(TextResourceKey))
                 Text = this.GetResourceManager()?.GetString(TextResourceKey) ?? Text;
 

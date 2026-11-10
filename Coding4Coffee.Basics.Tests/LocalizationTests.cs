@@ -36,7 +36,7 @@ namespace Coding4Coffee.Basics.Tests
 
                 Assert.Equal("Fallback Text", str.ToString());
 
-                string implicitStr = str;
+                string? implicitStr = str;
                 Assert.Equal("Fallback Text", implicitStr);
             }
             finally
@@ -139,6 +139,68 @@ namespace Coding4Coffee.Basics.Tests
         }
 
         [Fact]
+        public void LocalizationManager_HasConfiguredCulture_TracksConfigurationState()
+        {
+            var initialCulture = LocalizationManager.CurrentCulture;
+            string key = $"AppCulture_{Guid.NewGuid()}";
+
+            try
+            {
+                LocalizationManager.CultureConfigKey = string.Empty;
+                Assert.False(LocalizationManager.HasConfiguredCulture);
+
+                LocalizationManager.CultureConfigKey = key;
+                Assert.False(LocalizationManager.HasConfiguredCulture);
+
+                LocalizationManager.CurrentCulture = new CultureInfo("it-IT");
+                Assert.True(LocalizationManager.HasConfiguredCulture);
+            }
+            finally
+            {
+                LocalizationManager.CultureConfigKey = string.Empty;
+                LocalizationManager.CurrentCulture = initialCulture;
+            }
+        }
+
+        [Fact]
+        public void LocalizationManager_ResetToSystemCulture_ClearsConfigurationAndAppliesCulture()
+        {
+            var initialCulture = LocalizationManager.CurrentCulture;
+            string key = $"AppCulture_{Guid.NewGuid()}";
+
+            try
+            {
+                LocalizationManager.CultureConfigKey = key;
+                LocalizationManager.CurrentCulture = new CultureInfo("ja-JP");
+                Assert.True(LocalizationManager.HasConfiguredCulture);
+                Assert.Equal("ja-JP", LocalizationManager.CurrentCulture.Name);
+
+                bool eventFired = false;
+                EventHandler handler = (s, e) => eventFired = true;
+                LocalizationManager.CultureChanged += handler;
+
+                try
+                {
+                    var fallback = new CultureInfo("en-US");
+                    LocalizationManager.ResetToSystemCulture(fallback);
+
+                    Assert.False(LocalizationManager.HasConfiguredCulture);
+                    Assert.Equal("en-US", LocalizationManager.CurrentCulture.Name);
+                    Assert.True(eventFired);
+                }
+                finally
+                {
+                    LocalizationManager.CultureChanged -= handler;
+                }
+            }
+            finally
+            {
+                LocalizationManager.CultureConfigKey = string.Empty;
+                LocalizationManager.CurrentCulture = initialCulture;
+            }
+        }
+
+        [Fact]
         public void SetCultureCommand_CanExecute_And_Execute()
         {
             var initialCulture = LocalizationManager.CurrentCulture;
@@ -158,6 +220,43 @@ namespace Coding4Coffee.Basics.Tests
             }
             finally
             {
+                LocalizationManager.CurrentCulture = initialCulture;
+            }
+        }
+
+        [Fact]
+        public void ResetCultureToSystemDefaultCommand_CanExecute_And_Execute()
+        {
+            var initialCulture = LocalizationManager.CurrentCulture;
+            string key = $"AppCulture_{Guid.NewGuid()}";
+            var fallback = new CultureInfo("en-US");
+            var command = new ResetCultureToSystemDefaultCommand(fallback);
+
+            try
+            {
+                LocalizationManager.CultureConfigKey = key;
+                LocalizationManager.CurrentCulture = new CultureInfo("de-DE");
+                Assert.True(LocalizationManager.HasConfiguredCulture);
+
+                // CanExecute is true because a culture is configured
+                Assert.True(command.CanExecute(null));
+
+                bool canExecuteChangedFired = false;
+                command.CanExecuteChanged += (s, e) => canExecuteChangedFired = true;
+
+                command.Execute(null);
+
+                // Culture was reset to fallback and config was cleared
+                Assert.False(LocalizationManager.HasConfiguredCulture);
+                Assert.Equal("en-US", LocalizationManager.CurrentCulture.Name);
+                Assert.True(canExecuteChangedFired);
+
+                // Now that culture is already fallback and no config is saved, CanExecute should be false
+                Assert.False(command.CanExecute(null));
+            }
+            finally
+            {
+                LocalizationManager.CultureConfigKey = string.Empty;
                 LocalizationManager.CurrentCulture = initialCulture;
             }
         }

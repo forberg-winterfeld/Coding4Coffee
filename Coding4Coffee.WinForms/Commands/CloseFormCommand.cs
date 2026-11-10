@@ -35,7 +35,8 @@ namespace Coding4Coffee.WinForms.Commands
         /// </summary>
         /// <param name="_">The command parameter (ignored).</param>
         /// <returns><see langword="true"/> if the form is not disposed or disposing; otherwise, <see langword="false"/>.</returns>
-        public bool CanExecute(object? _) => !_form.IsDisposed && !_form.Disposing;
+        public bool CanExecute(object? _)
+            => !_form.IsDisposed && !_form.Disposing;
 
         /// <summary>
         /// Executes the command, closing the associated form.

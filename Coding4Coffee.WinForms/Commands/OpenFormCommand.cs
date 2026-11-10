@@ -92,7 +92,8 @@ namespace Coding4Coffee.WinForms.Commands
         /// </summary>
         /// <param name="parameter">An optional parameter (ignored by the execution predicate).</param>
         /// <returns><see langword="true"/> if the command can execute; otherwise, <see langword="false"/>.</returns>
-        public virtual bool CanExecute(object? parameter) => _canExecute?.Invoke() ?? true;
+        public virtual bool CanExecute(object? parameter)
+            => _canExecute?.Invoke() ?? true;
 
         /// <summary>
         /// Executes the command, opening the form or restoring and focusing it if it is already open.
@@ -133,7 +134,8 @@ namespace Coding4Coffee.WinForms.Commands
         /// <summary>
         /// Raises the <see cref="CanExecuteChanged"/> event.
         /// </summary>
-        protected virtual void OnCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        protected virtual void OnCanExecuteChanged()
+            => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 
         private void ManagedForm_FormClosed(object? sender, FormClosedEventArgs e)
         {

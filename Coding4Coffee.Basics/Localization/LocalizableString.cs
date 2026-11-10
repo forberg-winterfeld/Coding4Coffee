@@ -26,7 +26,7 @@ namespace Coding4Coffee.Basics.Localization
         /// <summary>
         /// Implicitly converts a <see cref="LocalizableString"/> to a <see cref="string"/>.
         /// </summary>
-        /// <param name="localizableString">The <see cref="LocalizableString"/> instance to convert.</param>
-        public static implicit operator string(LocalizableString localizableString) => localizableString.ToString();
+        /// <param name="localizableString">The <see cref="LocalizableString"/> instance to convert, or <see langword="null"/>.</param>
+        public static implicit operator string?(LocalizableString? localizableString) => localizableString?.ToString();
     }
 }

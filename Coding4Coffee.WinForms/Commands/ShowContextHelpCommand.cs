@@ -31,7 +31,7 @@ namespace Coding4Coffee.WinForms.Commands
         private static partial IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         private readonly IWin32Window _window;
-
+ 
         /// <summary>
         /// Initializes a new command for displaying context help.
         /// </summary>
@@ -47,8 +47,16 @@ namespace Coding4Coffee.WinForms.Commands
         /// the underlying window is disposed, which cannot be reliably tracked without accessing
         /// the window's protected lifetime. Always call CanExecute directly before Execute.
         /// </summary>
+        /// <remarks>
+        /// Not applicable for this command. Call CanExecute directly instead.
+        /// The event is provided only to fulfill the ICommand contract. It is never raised.
+        /// </remarks>
         [Obsolete("Not applicable for this command. Call CanExecute directly instead.", error: false)]
-        public event EventHandler? CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
 
         /// <summary>
         /// Determines whether the command can be executed.

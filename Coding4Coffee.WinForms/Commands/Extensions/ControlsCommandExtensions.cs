@@ -1,6 +1,6 @@
 using System.Windows.Input;
 
-namespace Coding4Coffee.WinForms.Commands
+namespace Coding4Coffee.WinForms.Commands.Extensions
 {
     /// <summary>
     /// Extension methods for setting commands on WinForms controls.
@@ -8,17 +8,17 @@ namespace Coding4Coffee.WinForms.Commands
     public static class ControlsCommandExtensions
     {
         /// <summary>
-        /// Binds a command and optional parameter to a <see cref="ToolStripMenuItem"/>.
+        /// Binds a command and optional parameter to a <see cref="ToolStripItem"/>.
         /// </summary>
         /// <remarks>
         /// Assigns <paramref name="command"/> and <paramref name="parameter"/> to the native
-        /// <c>ToolStripMenuItem.Command</c> and <c>ToolStripMenuItem.CommandParameter</c> properties.
+        /// <c>ToolStripItem.Command</c> and <c>ToolStripItem.CommandParameter</c> properties.
         /// </remarks>
-        /// <param name="control">The <see cref="ToolStripMenuItem"/> instance to bind.</param>
+        /// <param name="control">The <see cref="ToolStripItem"/> instance to bind.</param>
         /// <param name="command">The command to assign.</param>
         /// <param name="parameter">The optional parameter value for the command.</param>
         /// <returns>The <paramref name="control"/> instance to support fluent method chaining.</returns>
-        public static ToolStripMenuItem BindCommand(this ToolStripMenuItem control, ICommand command, object? parameter = null)
+        public static ToolStripItem BindCommand(this ToolStripItem control, ICommand command, object? parameter = null)
         {
             control.CommandParameter = parameter;
             control.Command = command;

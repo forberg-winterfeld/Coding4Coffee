@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Windows.Input;
 
@@ -33,7 +32,8 @@ namespace Coding4Coffee.Basics.Localization.Commands
         /// </summary>
         /// <param name="parameter">The name of the culture to check (must be a non-empty string that differs from the current culture).</param>
         /// <returns><c>true</c> if the culture can be changed; otherwise, <c>false</c>.</returns>
-        public bool CanExecute(object? parameter) => parameter is string cultureName && cultureName != LocalizationManager.CurrentCulture.Name;
+        public bool CanExecute(object? parameter)
+            => parameter is string cultureName && cultureName != LocalizationManager.CurrentCulture.Name;
 
         /// <summary>
         /// Executes the command to change the current application culture.
@@ -42,10 +42,7 @@ namespace Coding4Coffee.Basics.Localization.Commands
         public void Execute(object? parameter)
         {
             if (parameter is string cultureName)
-            {
-                CultureInfo culture = CultureInfo.GetCultureInfo(cultureName);
-                LocalizationManager.CurrentCulture = culture;
-            }
+                LocalizationManager.CurrentCulture = CultureInfo.GetCultureInfo(cultureName);
         }
     }
 }

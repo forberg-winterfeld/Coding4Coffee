@@ -19,10 +19,8 @@ namespace Coding4Coffee.Basics.Configuration
         /// <param name="key">The key under which the config value is stored.</param>
         /// <param name="isTransient">Controls whether the setting is persisted to a settings file.</param>
         /// <returns>A <see cref="Config{T}"/> instance associated with the specified key.</returns>
-        public static Config<T> GetConfig<T>(string key, bool isTransient = false)
-        {
-            return GetCustomConfig<Config<T>>(key, isTransient);
-        }
+        public static Config<T> GetConfig<T>(string key, bool isTransient = false) 
+            => GetCustomConfig<Config<T>>(key, isTransient);
 
         /// <summary>
         /// Creates or retrieves a specialized configuration setting by its key.
@@ -46,13 +44,9 @@ namespace Coding4Coffee.Basics.Configuration
             }
 
             if (config is TConfig typedConfig)
-            {
                 return typedConfig;
-            }
             else
-            {
                 throw new InvalidOperationException("That key has already been used with another config type.");
-            }
         }
 
         /// <summary>Gets or creates a <see cref="CultureInfoConfig"/>.</summary>

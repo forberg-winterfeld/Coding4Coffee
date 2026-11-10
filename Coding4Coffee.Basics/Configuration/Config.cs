@@ -15,7 +15,7 @@ namespace Coding4Coffee.Basics.Configuration
         public event EventHandler? ValueChanged;
 
         /// <summary>Initializes a new instance of <see cref="Config{TValue}"/>.</summary>
-        public Config() {/* no op */}
+        public Config() { }
 
         /// <summary>Initializes a new instance of <see cref="Config{TValue}"/> with a key and optional persistence flag.</summary>
         /// <param name="key">The key under which the config value is stored.</param>
@@ -55,9 +55,7 @@ namespace Coding4Coffee.Basics.Configuration
                         _settingsContent = ConfigFactory.Settings?[Key]?.ToString();
 
                         if (!string.IsNullOrWhiteSpace(_settingsContent))
-                        {
                             _value = JsonSerializer.Deserialize<TValue>(_settingsContent);
-                        }
                     }
                     catch(JsonException)
                     {
