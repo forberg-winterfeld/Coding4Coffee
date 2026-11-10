@@ -6,7 +6,7 @@ A lightweight, modern .NET 10 utility library providing strongly-typed configura
 
 - ⚙️ **Configuration Management**: Strongly-typed configuration wrapper (`Config<TValue>`) with JSON serialization and optional persistence via `SettingsBase`. Includes specialized handlers for 7 types with custom serialization needs (`CultureInfoConfig`, `DirectoryInfoConfig`, `FileInfoConfig`, `UriConfig`, `IPAddressConfig`, `VersionConfig`, `EncodingConfig`) and implicit cast operators.
 - 🌐 **Dynamic Localization**: Runtime culture switching via `LocalizationManager`, localizable strings (`LocalizableString`) with formatting and fallback values, and automatic culture change notifications.
-- ⚡ **MVVM Commands**: Ready-to-use `ICommand` implementations: `AlwaysExecutableCommand`, `AsyncCommandBase`, `AsyncCommandBase<T>`, and `SetCultureCommand`.
+- ⚡ **MVVM Commands**: Ready-to-use `ICommand` implementations: `AlwaysExecutableCommand`, `AsyncCommandBase`, `AsyncCommandBase<T>`, `SetCultureCommand`, and framework-agnostic interfaces for application lifecycle management (`IExitApplicationCommand`, `IRestartApplicationCommand`).
 
 ## Installation
 
@@ -101,6 +101,58 @@ SetCultureCommand.Instance.Execute("en-US");
 - Constructor: `LocalizableString(string resourceKey, string fallbackValue)`
 - `ToString()` - Get the localized string value
 - Implicit cast to `string`
+
+### Application Lifecycle Commands
+
+Framework-agnostic command interfaces for managing application lifecycle. Framework-specific implementations (WinForms, WPF, MAUI, etc.) can be found in their respective packages.
+
+#### IExitApplicationCommand
+Abstraction for application exit command implementations across different UI frameworks.
+
+**Contract:**
+- Implements `ICommand` interface
+- Event `Exiting` - Raised immediately before application exit is initiated
+- Method `RaiseCanExecuteChanged()` - Signals that the command's ability to execute may have changed
+
+**Framework Implementations:**
+- **WinForms**: `Coding4Coffee.WinForms.Commands.ExitApplicationCommand` - Uses `Application.Exit()`
+
+**Example Usage (Framework-Agnostic):**
+```csharp
+using Coding4Coffee.Basics.Commands;
+
+public void SetupExitCommand(IExitApplicationCommand exitCommand)
+{
+    exitCommand.Exiting += (_, e) => Console.WriteLine("Application is exiting...");
+    exitCommand.Execute(null);
+}
+```
+
+---
+
+#### IRestartApplicationCommand
+Abstraction for application restart command implementations across different UI frameworks.
+
+**Contract:**
+- Implements `ICommand` interface
+- Event `Restarting` - Raised immediately before application restart is initiated
+- Method `RaiseCanExecuteChanged()` - Signals that the command's ability to execute may have changed
+
+**Framework Implementations:**
+- **WinForms**: `Coding4Coffee.WinForms.Commands.RestartApplicationCommand` - Uses `Application.Restart()`
+
+**Example Usage (Framework-Agnostic):**
+```csharp
+using Coding4Coffee.Basics.Commands;
+
+public void SetupRestartCommand(IRestartApplicationCommand restartCommand)
+{
+    restartCommand.Restarting += (_, e) => Console.WriteLine("Application is restarting...");
+    restartCommand.Execute(null);
+}
+```
+
+---
 
 ## License
 

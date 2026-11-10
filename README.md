@@ -118,13 +118,13 @@ Coding4Coffee/
 - ✅ Runtime culture switching with event notifications
 - ✅ Strongly-typed configuration with implicit casting
 - ✅ Optional JSON persistence via `SettingsBase`
-- ✅ 4 pre-built `ICommand` implementations
+- ✅ 6 pre-built `ICommand` implementations (including framework-agnostic lifecycle commands)
 
 ### Coding4Coffee.WinForms
 - ✅ 45 localizable WinForms controls
 - ✅ Automatic localization on culture change
 - ✅ Command binding for ButtonBase and ToolStripMenuItem
-- ✅ 3 form & control management commands
+- ✅ 21+ commands for form management, dialogs, clipboard, and system integration
 - ✅ Custom serialization for Colors, Fonts, Icons, and Images
 - ✅ 21 command-enabled control types with intelligent parameter fallback and debounce support
 
