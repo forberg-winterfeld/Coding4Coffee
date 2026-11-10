@@ -205,6 +205,351 @@ The library provides localizable versions of 45 major WinForms controls:
 - `CloseFormCommand` - Closes a form
 - `ShowContextHelpCommand` - Shows context help for a control
 
+## Commands Reference
+
+Comprehensive documentation for all available commands in Coding4Coffee.WinForms:
+
+### Form Management
+
+#### CloseFormCommand
+**Purpose:** Closes a specific form.
+
+**Usage:**
+```csharp
+var closeCommand = new CloseFormCommand(myForm);
+exitButton.BindCommand(closeCommand);
+```
+
+**Characteristics:** Monitors the form's lifecycle and prevents errors when closing an already-disposed form.
+
+---
+
+#### OpenFormCommand<TForm>
+**Purpose:** Opens a form as a modeless window. Manages a single instance and restores it if already open.
+
+**Usage:**
+```csharp
+var openSettingsCommand = new OpenFormCommand<SettingsForm>();
+settingsButton.BindCommand(openSettingsCommand);
+
+openSettingsCommand.Execute(null); // Opens or activates SettingsForm
+```
+
+**Characteristics:** 
+- Creates the form on first execution
+- Restores minimized windows and brings them to foreground
+- `IsOpen` property indicates whether the form is open
+- Maintains separate instances per form type
+
+---
+
+#### OpenFormAsDialogCommand<TForm>
+**Purpose:** Opens a form as a modal dialog window (blocks other windows).
+
+**Usage:**
+```csharp
+var openDialogCommand = new OpenFormAsDialogCommand<ConfirmDeleteForm>();
+deleteButton.BindCommand(openDialogCommand);
+```
+
+**Characteristics:** Waits for dialog closure before continuing application execution.
+
+---
+
+#### ExitApplicationCommand
+**Purpose:** Cleanly terminates the entire application.
+
+**Usage:**
+```csharp
+var exitCommand = new ExitApplicationCommand();
+exitMenuItem.BindCommand(exitCommand);
+
+// With confirmation dialog
+var exitWithConfirm = new ExitApplicationCommand(confirmExit: () => 
+    MessageBox.Show("Are you sure you want to exit?", "Exit", 
+    MessageBoxButtons.YesNo) == DialogResult.Yes);
+```
+
+**Characteristics:** 
+- Differs from `CloseFormCommand` - exits entire application
+- Allows each form to run its `FormClosing` events
+- Optional confirmation callback
+
+---
+
+### Window State Management
+
+#### MinimizeFormCommand
+**Purpose:** Minimizes a specific form.
+
+**Usage:**
+```csharp
+var minimizeCommand = new MinimizeFormCommand(myForm);
+minimizeButton.BindCommand(minimizeCommand);
+```
+
+---
+
+#### MaximizeFormCommand
+**Purpose:** Maximizes a specific form.
+
+**Usage:**
+```csharp
+var maximizeCommand = new MaximizeFormCommand(myForm);
+maximizeButton.BindCommand(maximizeCommand);
+```
+
+---
+
+#### RestoreFormCommand
+**Purpose:** Restores a minimized or maximized form to normal size.
+
+**Usage:**
+```csharp
+var restoreCommand = new RestoreFormCommand(myForm);
+restoreButton.BindCommand(restoreCommand);
+```
+
+---
+
+#### ToggleWindowStateCommand
+**Purpose:** Toggles between maximized and normal window size.
+
+**Usage:**
+```csharp
+var toggleCommand = new ToggleWindowStateCommand(myForm);
+toggleButton.BindCommand(toggleCommand);
+```
+
+---
+
+### User Input & Interaction
+
+#### FocusControlCommand
+**Purpose:** Sets keyboard focus to a specific control.
+
+**Usage:**
+```csharp
+var focusCommand = new FocusControlCommand(searchTextBox) { SelectAllOnFocus = true };
+searchMenuItem.BindCommand(focusCommand);
+```
+
+**Characteristics:**
+- Optional: Automatically select text in TextBox when focused
+- Supports multiple sources: fixed control, provider function, or command parameter
+- Monitors control state changes and updates `CanExecute`
+
+---
+
+#### SwitchTabCommand
+**Purpose:** Switches between tabs in a TabControl forward or backward.
+
+**Usage:**
+```csharp
+var switchTabCommand = new SwitchTabCommand(tabControl);
+nextTabButton.BindCommand(switchTabCommand, SwitchTabDirection.Next);
+previousTabButton.BindCommand(switchTabCommand, SwitchTabDirection.Previous);
+```
+
+**Characteristics:**
+- Requires `SwitchTabDirection.Next` or `Previous` as parameter
+- Intelligent: Disables itself at boundary conditions
+- Monitors tab count and active index
+
+---
+
+### Clipboard & System Integration
+
+#### CopyToClipboardCommand
+**Purpose:** Safely copies text or data to the Windows Clipboard.
+
+**Usage:**
+```csharp
+// Parameter-driven
+var copyCommand = new CopyToClipboardCommand();
+copyButton.BindCommand(copyCommand, "Text to copy");
+
+// With dynamic provider
+var copySelectedCommand = new CopyToClipboardCommand(() => listBox.SelectedItem?.ToString());
+copyCommand.Copied += (_, e) => ShowNotification($"Copied: {e.Text}");
+```
+
+**Characteristics:**
+- Graceful handling of clipboard locks
+- `LastCopiedData` property shows most recently copied data
+- `Copied` event for notifications
+
+---
+
+#### OpenUrlCommand
+**Purpose:** Opens a URL in the default web browser or associated system application.
+
+**Usage:**
+```csharp
+// Static URL
+var helpCommand = new OpenUrlCommand("https://coding4coffee.dev/docs");
+helpButton.BindCommand(helpCommand);
+
+// Parameter-driven
+var openUrlCommand = new OpenUrlCommand();
+openUrlCommand.Execute("https://github.com");
+```
+
+**Characteristics:**
+- Security: Only predefined URI schemes (http, https, mailto) allowed
+- Customizable: `AllowedSchemes` property
+- `LastOpenedUri` property for auditing/logging
+
+---
+
+#### OpenFileCommand
+**Purpose:** Opens a file with the default system application.
+
+**Usage:**
+```csharp
+var openFileCommand = new OpenFileCommand("C:\\Documents\\report.pdf");
+openFileButton.BindCommand(openFileCommand);
+```
+
+---
+
+#### ShowInExplorerCommand
+**Purpose:** Opens a file or folder in Windows Explorer and highlights the item.
+
+**Usage:**
+```csharp
+var exploreCommand = new ShowInExplorerCommand("C:\\Documents\\report.pdf");
+exploreButton.BindCommand(exploreCommand);
+```
+
+---
+
+### Dialog & Message Boxes
+
+#### ShowMessageBoxCommand
+**Purpose:** Displays a configured message box and captures the result.
+
+**Usage:**
+```csharp
+// Simple alert
+var alertCommand = new ShowMessageBoxCommand("Data saved successfully.", "Success", 
+    MessageBoxButtons.OK, MessageBoxIcon.Information);
+alertCommand.Execute(this);
+
+// Confirmation dialog with reaction
+var confirmCommand = new ShowMessageBoxCommand(
+    "Really delete this item?", "Confirm", 
+    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+confirmCommand.MessageBoxClosed += (_, e) => 
+{
+    if (e.DialogResult == DialogResult.Yes)
+        DeleteItem();
+};
+confirmCommand.Execute(this);
+```
+
+**Characteristics:**
+- `LastDialogResult` property for result access
+- `MessageBoxClosed` event for async handling
+- Supports all standard MessageBox configurations
+
+---
+
+#### ShowTaskDialogCommand
+**Purpose:** Displays a modern Task Dialog (Windows Vista+).
+
+**Usage:**
+```csharp
+var taskDialogCommand = new ShowTaskDialogCommand(mainForm)
+{
+    Title = "Save changes?",
+    MainInstruction = "Have you made any changes?",
+    Content = "Your changes will be lost if you don't save."
+};
+taskDialogCommand.Execute(null);
+```
+
+**Characteristics:**
+- More modern UI than `MessageBoxCommand`
+- Highly configurable
+- `TaskDialogClosed` event for results
+
+---
+
+#### OpenDialogCommand<TDialog>
+**Purpose:** Opens a standard dialog (File Open, Save, etc.) and manages the result.
+
+**Usage:**
+```csharp
+var openFileDialogCommand = new OpenDialogCommand<OpenFileDialog>();
+openFileButton.BindCommand(openFileDialogCommand);
+
+// With specific configuration
+var openDialogCommand = new OpenDialogCommand<OpenFileDialog>(
+    () => new OpenFileDialog 
+    { 
+        Filter = "Text Files|*.txt|All Files|*.*" 
+    });
+openDialogCommand.Execute(this);
+```
+
+**Characteristics:**
+- Supports any dialog type
+- `LastDialogResult` contains selected file/folder path
+- Flexible configuration via factory function
+
+---
+
+### Workflow & Execution Control
+
+#### ConfirmAndExecuteCommand
+**Purpose:** Shows a confirmation prompt and executes an inner command only if user approves.
+
+**Usage:**
+```csharp
+var innerCommand = new ExitApplicationCommand();
+var confirmCommand = new ConfirmAndExecuteCommand(
+    innerCommand, 
+    "Are you really sure you want to exit?", 
+    "Confirmation Required");
+exitButton.BindCommand(confirmCommand);
+```
+
+**Characteristics:**
+- Wraps commands for safety
+- Delegates `CanExecute` to inner command
+- Simple user confirmation before critical actions
+
+---
+
+#### RestartApplicationCommand
+**Purpose:** Restarts the application.
+
+**Usage:**
+```csharp
+var restartCommand = new RestartApplicationCommand();
+restartButton.BindCommand(restartCommand);
+```
+
+**Characteristics:**
+- Terminates current instance and launches new one
+- Abstracts process management details
+
+---
+
+### Help & Documentation
+
+#### ShowContextHelpCommand
+**Purpose:** Shows context-sensitive help for a control.
+
+**Usage:**
+```csharp
+var helpCommand = new ShowContextHelpCommand(myControl);
+helpButton.BindCommand(helpCommand);
+```
+
+---
+
 ## Configuration Types
 
 ### Standard Types (via ConfigFactory)
