@@ -147,12 +147,12 @@ namespace Coding4Coffee.WinForms.Tests.Commands
         public void WindowStateCommand_FormResize_RaisesCanExecuteChanged()
         {
             using var form = new Form { MaximizeBox = true, WindowState = FormWindowState.Normal };
-            var command = new MaximizeFormCommand(form);
+            using var command = new MaximizeFormCommand(form);
 
             bool eventFired = false;
             command.CanExecuteChanged += (_, _) => eventFired = true;
 
-            form.WindowState = FormWindowState.Maximized;
+            form.Width++;
 
             Assert.True(eventFired);
         }

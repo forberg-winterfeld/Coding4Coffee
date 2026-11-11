@@ -1,0 +1,58 @@
+name: Build and publish Coding4Coffee.WinForms
+
+on:
+  push:
+    tags:
+      - "winforms-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run WinForms tests
+        run: dotnet test Coding4Coffee.WinForms.Tests/Coding4Coffee.WinForms.Tests.csproj --configuration Release
+
+      - name: Read package version from tag
+        shell: bash
+        run: |
+          package_version="${GITHUB_REF_NAME#winforms-v}"
+          if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Tag must use the format winforms-v<version>, for example winforms-v1.0.2." >&2
+            exit 1
+          fi
+          echo "PACKAGE_VERSION=$package_version" >> "$GITHUB_ENV"
+
+      - name: Verify project version matches tag
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content Coding4Coffee.WinForms/Coding4Coffee.WinForms.csproj
+          $projectVersion = $project.Project.PropertyGroup.Version
+          if ($projectVersion -ne $env:PACKAGE_VERSION) {
+            throw "Tag version $env:PACKAGE_VERSION does not match project version $projectVersion."
+          }
+
+      - name: Pack WinForms project
+        run: dotnet pack Coding4Coffee.WinForms/Coding4Coffee.WinForms.csproj --configuration Release --output ./artifacts
+
+      - name: NuGet login (OIDC to temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Publish to NuGet.org
+        run: dotnet nuget push artifacts/*.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json

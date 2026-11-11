@@ -139,6 +139,8 @@ namespace Coding4Coffee.WinForms.Tests.Commands
             using var tabControl = new TabControl();
             tabControl.TabPages.Add("Tab 1");
             tabControl.TabPages.Add("Tab 2");
+            _ = tabControl.Handle;
+            tabControl.SelectedIndex = 0;
             using var command = new SwitchTabCommand(tabControl);
 
             int eventCount = 0;
