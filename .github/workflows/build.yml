@@ -1,0 +1,49 @@
+name: Build and publish Coding4Coffee.Basics
+
+on:
+  push:
+    tags:
+      - "basics-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run Basics tests
+        run: dotnet test Coding4Coffee.Basics.Tests/Coding4Coffee.Basics.Tests.csproj --configuration Release
+
+      - name: Read package version from tag
+        shell: bash
+        run: |
+          package_version="${GITHUB_REF_NAME#basics-v}"
+          if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Tag must use the format basics-v<version>, for example basics-v1.0.2." >&2
+            exit 1
+          fi
+          echo "PACKAGE_VERSION=$package_version" >> "$GITHUB_ENV"
+
+      - name: Pack Basics project
+        run: dotnet pack Coding4Coffee.Basics/Coding4Coffee.Basics.csproj --configuration Release --output ./artifacts -p:Version="$PACKAGE_VERSION"
+
+      - name: NuGet login (OIDC to temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Publish to NuGet.org
+        run: dotnet nuget push artifacts/*.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
