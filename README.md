@@ -219,3 +219,11 @@ This project is distributed under the **MIT License**.
 
 **Made with ☕ by the Coding4Coffee team**
 
+## ☕ Support This Project
+
+If you find this project helpful and would like to support its development, consider buying me a coffee!
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20me-FF5E5B?style=flat-square&logo=kofi&logoColor=white)](https://ko-fi.com/forbergwinterfeld)
+
+*Your support helps fuel the development and maintenance of Coding4Coffee. Thank you!* ❤️
+
