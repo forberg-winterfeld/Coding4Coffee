@@ -42,7 +42,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Executed in response to <see cref="ToolStrip.ItemClicked"/> event.
         /// Useful for reacting to specific navigation button clicks or other navigator toolbar actions.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? ItemClickedCommand
         {
             get => _itemClickedCommand;
@@ -58,7 +58,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the ItemClickedCommand on ItemClicked event. Defaults to the ToolStripItem.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? ItemClickedCommandParameter
         {
             get => _itemClickedCommandParameter;
@@ -98,7 +98,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Executed in response to <see cref="BindingSource.PositionChanged"/> event.
         /// Useful for data-aware actions tied to navigation, such as loading related data or updating dependent controls.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? PositionChangedCommand
         {
             get => _positionChangedCommand;
@@ -114,7 +114,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the PositionChangedCommand on PositionChanged event. Defaults to the current Position.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? PositionChangedCommandParameter
         {
             get => _positionChangedCommandParameter;

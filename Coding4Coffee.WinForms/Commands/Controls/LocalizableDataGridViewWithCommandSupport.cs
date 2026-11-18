@@ -94,7 +94,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Executed in response to <see cref="DataGridView.CellClick"/> event.
         /// Useful for context menus, detail views, or selection-based actions.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? CellClickCommand
         {
             get => _cellClickCommand;
@@ -110,7 +110,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the CellClickCommand on CellClick event. Defaults to Cell.Value or Row.DataBoundItem.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CellClickCommandParameter
         {
             get => _cellClickCommandParameter;
@@ -153,7 +153,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Executed in response to <see cref="DataGridView.CellDoubleClick"/> event, which occurs after CellClick but before <see cref="DataGridView.CellBeginEdit"/>.
         /// Useful for opening detail views, inline editors, or confirming selections.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? CellDoubleClickCommand
         {
             get => _cellDoubleClickCommand;
@@ -169,7 +169,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the CellDoubleClickCommand on CellDoubleClick event. Defaults to Cell.Value or Row.DataBoundItem.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CellDoubleClickCommandParameter
         {
             get => _cellDoubleClickCommandParameter;
@@ -213,7 +213,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// This provides deferred value persistence, similar to TextBox debouncing. Fires after <see cref="CellEndEditCommand"/>.
         /// Set <see cref="CellValueChangedDebounceInterval"/> to 0 for immediate execution.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? CellValueChangedCommand
         {
             get => _cellValueChangedCommand;
@@ -229,7 +229,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the CellValueChangedCommand on CellValueChanged event (debounced). Defaults to Cell.Value or Row.DataBoundItem.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CellValueChangedCommandParameter
         {
             get => _cellValueChangedCommandParameter;
@@ -299,7 +299,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// If the command's execution indicates failure (via <see cref="ICommand.CanExecute(object?)"/>), the edit can be prevented.
         /// Useful for pre-edit state preservation, readonly checks, or dependency validation.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? CellBeginEditCommand
         {
             get => _cellBeginEditCommand;
@@ -315,7 +315,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the CellBeginEditCommand on CellBeginEdit event (before edit begins). Defaults to the DataGridViewCell.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CellBeginEditCommandParameter
         {
             get => _cellBeginEditCommandParameter;
@@ -365,7 +365,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Useful for input validation, data transformation, or consistency checks before committing.
         /// Note: Unlike <see cref="CellValueChangedCommand"/>, this fires on every edit exit, even if the value did not actually change.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? CellEndEditCommand
         {
             get => _cellEndEditCommand;
@@ -381,7 +381,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the CellEndEditCommand on CellEndEdit event (after edit, before commit). Defaults to the DataGridViewCell.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CellEndEditCommandParameter
         {
             get => _cellEndEditCommandParameter;
@@ -425,7 +425,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Fires whenever any cell, row, or column selection changes. Useful for enabling/disabling dependent controls,
         /// loading related data, or updating status displays based on the current selection.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? SelectionChangedCommand
         {
             get => _selectionChangedCommand;
@@ -441,7 +441,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the SelectionChangedCommand on SelectionChanged event. Defaults to CurrentCell or first SelectedRow.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? SelectionChangedCommandParameter
         {
             get => _selectionChangedCommandParameter;
@@ -494,7 +494,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// allowing you to perform additional actions like context menu display or bulk operation triggers.
         /// Right-click row header clicks can be distinguished by button detection in subclassed handlers if needed.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? RowHeaderClickCommand
         {
             get => _rowHeaderClickCommand;
@@ -510,7 +510,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the RowHeaderClickCommand on RowHeaderMouseClick event. Defaults to Row.DataBoundItem or Row.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? RowHeaderClickCommandParameter
         {
             get => _rowHeaderClickCommandParameter;

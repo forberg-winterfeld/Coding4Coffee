@@ -35,7 +35,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Executed in response to <see cref="CheckedListBox.ItemCheck"/>.
         /// The command receives the item at the changed index.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? Command
         {
             get => _command;
@@ -51,7 +51,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the command on ItemCheck event. If not set, the changed item is used.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CommandParameter
         {
             get => _commandParameter;

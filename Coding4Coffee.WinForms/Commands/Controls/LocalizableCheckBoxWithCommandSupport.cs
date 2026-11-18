@@ -21,7 +21,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// executes the command on <c>Click</c>, whereas this implementation executes it on
         /// <c>CheckedChanged</c> – the semantically correct trigger for a toggle control.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new ICommand? Command
         {
             get => _command;
@@ -58,7 +58,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the command on CheckedChanged event. If not set, Checked is used.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new object? CommandParameter
         {
             get => _commandParameter;

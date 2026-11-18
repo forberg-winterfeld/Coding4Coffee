@@ -24,7 +24,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// <see cref="RadioButton.CheckedChanged"/> on both buttons: first on the deselected button
         /// (with <see langword="false"/>), then on the newly selected button (with <see langword="true"/>).
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new ICommand? Command
         {
             get => _command;
@@ -61,7 +61,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the command on CheckedChanged event. If not set, Checked is used.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new object? CommandParameter
         {
             get => _commandParameter;

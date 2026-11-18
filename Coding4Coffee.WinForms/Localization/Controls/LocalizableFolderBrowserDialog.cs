@@ -38,7 +38,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         /// </summary>
         [Browsable(true)]
         [Category("Localization")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? DescriptionResourceKey { get; set; }
 
         /// <summary>

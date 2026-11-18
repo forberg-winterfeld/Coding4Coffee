@@ -33,7 +33,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// <remarks>
         /// Executed in response to <see cref="LinkLabel.LinkClicked"/>.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? Command
         {
             get => _command;
@@ -60,7 +60,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the command on LinkClicked event.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CommandParameter
         {
             get => _commandParameter;

@@ -44,7 +44,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Command executed when a list view item is selected.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? SelectCommand
         {
             get => _selectCommand;
@@ -61,7 +61,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Optional parameter for the SelectCommand on ItemSelectionChanged event. Defaults to SelectedItem.Tag or SelectedItem.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? SelectCommandParameter
         {
             get => _selectCommandParameter;
@@ -107,7 +107,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Command executed when a list view item is double-clicked.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? DoubleClickCommand
         {
             get => _doubleClickCommand;
@@ -124,7 +124,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Optional parameter for the DoubleClickCommand on MouseDoubleClick event.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? DoubleClickCommandParameter
         {
             get => _doubleClickCommandParameter;

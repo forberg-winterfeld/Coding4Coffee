@@ -38,7 +38,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         /// </summary>
         [Browsable(true)]
         [Category("Localization")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? TitleResourceKey { get; set; }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         /// </summary>
         [Browsable(true)]
         [Category("Localization")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? FilterResourceKey { get; set; }
 
         /// <summary>

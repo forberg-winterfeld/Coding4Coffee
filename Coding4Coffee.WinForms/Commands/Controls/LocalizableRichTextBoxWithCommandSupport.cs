@@ -59,7 +59,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Automatically synchronizes <see cref="Control.Enabled"/> based on <see cref="ICommand.CanExecute(object?)"/>,
         /// passing <see cref="CommandParameter"/> (or <see cref="RichTextBox.Text"/> if <see cref="CommandParameter"/> is <see langword="null"/>).
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? Command
         {
             get => _command;
@@ -94,7 +94,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the command on TextChanged event (debounced). If not set, Text is used.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CommandParameter
         {
             get => _commandParameter;

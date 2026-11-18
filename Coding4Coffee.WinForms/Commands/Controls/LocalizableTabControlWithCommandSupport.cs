@@ -21,7 +21,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Automatically synchronizes <see cref="Control.Enabled"/> based on <see cref="ICommand.CanExecute(object?)"/>,
         /// passing <see cref="CommandParameter"/> (or the default parameter determined by <see cref="TabControl.SelectedTab"/>).
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? Command
         {
             get => _command;
@@ -56,7 +56,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the command on SelectedIndexChanged event. If not set, SelectedTab.Name is used.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CommandParameter
         {
             get => _commandParameter;

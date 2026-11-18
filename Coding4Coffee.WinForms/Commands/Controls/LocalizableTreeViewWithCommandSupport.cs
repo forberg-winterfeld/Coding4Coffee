@@ -48,7 +48,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Command executed when a tree node is selected.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? SelectCommand
         {
             get => _selectCommand;
@@ -65,7 +65,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Optional parameter for the SelectCommand on AfterSelect event. Defaults to SelectedNode.Tag or SelectedNode.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? SelectCommandParameter
         {
             get => _selectCommandParameter;
@@ -110,7 +110,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Command executed when a tree node is double-clicked.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? DoubleClickCommand
         {
             get => _doubleClickCommand;
@@ -127,7 +127,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Optional parameter for the DoubleClickCommand on NodeMouseDoubleClick event.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? DoubleClickCommandParameter
         {
             get => _doubleClickCommandParameter;
@@ -172,7 +172,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Command executed when a tree node is expanded.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? ExpandCommand
         {
             get => _expandCommand;
@@ -189,7 +189,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("Optional parameter for the ExpandCommand on AfterExpand event.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? ExpandCommandParameter
         {
             get => _expandCommandParameter;

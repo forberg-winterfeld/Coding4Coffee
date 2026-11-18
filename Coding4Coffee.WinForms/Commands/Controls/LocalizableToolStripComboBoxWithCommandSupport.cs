@@ -24,7 +24,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Automatically synchronizes <see cref="ToolStripItem.Enabled"/> based on <see cref="ICommand.CanExecute(object?)"/>,
         /// passing <see cref="CommandParameter"/> (or <see cref="ComboBox.SelectedItem"/> if <see cref="CommandParameter"/> is <see langword="null"/>).
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new ICommand? Command
         {
             get => _command;
@@ -59,7 +59,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the command on SelectionChangeCommitted event. If not set, SelectedItem is used.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new object? CommandParameter
         {
             get => _commandParameter;

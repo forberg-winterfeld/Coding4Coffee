@@ -68,7 +68,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Automatically synchronizes <see cref="Control.Enabled"/> based on <see cref="ICommand.CanExecute(object?)"/>,
         /// passing <see cref="TextCommandParameter"/> (or <see cref="TextBoxBase.Text"/> if <see cref="TextCommandParameter"/> is <see langword="null"/>).
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? TextCommand
         {
             get => _textCommand;
@@ -100,7 +100,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the TextCommand on TextChanged event (debounced). If not set, Text is used.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? TextCommandParameter
         {
             get => _textCommandParameter;
@@ -162,7 +162,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Useful for logging, error feedback, or sound/visual alerts when invalid input is attempted.
         /// The command parameter defaults to <see langword="null"/> or can be set to a custom value.
         /// </remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? MaskRejectionCommand
         {
             get => _maskRejectionCommand;
@@ -179,7 +179,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         [Browsable(true)]
         [Category("Data")]
         [Description("The parameter to pass to the MaskRejectionCommand on MaskInputRejected event.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? MaskRejectionCommandParameter
         {
             get => _maskRejectionCommandParameter;

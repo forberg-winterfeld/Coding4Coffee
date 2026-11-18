@@ -13,7 +13,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         /// </summary>
         [Browsable(true)]
         [Category("Localization")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? PlaceholderResourceKey { get; set; }
 
         /// <summary>

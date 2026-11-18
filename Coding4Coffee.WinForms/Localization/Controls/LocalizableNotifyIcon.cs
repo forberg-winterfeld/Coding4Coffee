@@ -39,7 +39,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         [Browsable(true)]
         [Category("Localization")]
         [Description("The resource key used to retrieve the localized tooltip text from the resource manager.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? TextResourceKey { get; set; }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         [Browsable(true)]
         [Category("Localization")]
         [Description("The resource key used to retrieve the localized balloon tip title from the resource manager.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? BalloonTipTitleResourceKey { get; set; }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         [Browsable(true)]
         [Category("Localization")]
         [Description("The resource key used to retrieve the localized balloon tip text from the resource manager.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? BalloonTipTextResourceKey { get; set; }
 
         /// <summary>

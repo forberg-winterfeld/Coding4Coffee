@@ -15,7 +15,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         [Browsable(true)]
         [Category("Localization")]
         [Description("The resource key used to retrieve the localized mask from the resource manager.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? MaskResourceKey { get; set; }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         [Browsable(true)]
         [Category("Localization")]
         [Description("The resource key used to retrieve the localized text from the resource manager.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string? TextResourceKey { get; set; }
 
         /// <summary>
