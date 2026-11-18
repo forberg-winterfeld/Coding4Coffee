@@ -1,11 +1,11 @@
 # Coding4Coffee.WinForms
 
-A modern Windows Forms library for .NET 10 providing localizable UI controls, MVVM-style command binding for controls, and form management commands.
+A modern Windows Forms library for .NET 10 and .NET 11 providing localizable UI controls, MVVM-style command binding for controls, and form management commands.
 
 ## Features
 
 - 🎨 **Localizable WinForms Controls**: Built-in dynamic localization support for 45 controls including `LocalizableForm`, `LocalizableButton`, `LocalizableLabel`, `LocalizableTextBox`, `LocalizableCheckBox`, `LocalizableRadioButton`, `LocalizableComboBox`, `LocalizableListBox`, `LocalizableCheckedListBox`, `LocalizableDataGridView`, `LocalizableGroupBox`, `LocalizableMenuStrip`, `LocalizableContextMenuStrip`, `LocalizableStatusStrip`, `LocalizableToolStrip`, and more.
-- ⚡ **Command-Enabled Controls**: Binds `ICommand` implementations to standard WinForms controls (`ButtonBase.BindCommand()`, `ToolStripMenuItem.BindCommand()`, and `NumericUpDownWithCommandSupport`).
+- ⚡ **Command-Enabled Controls**: Binds `ICommand` implementations to WinForms controls, including `LocalizableButtonWithCommandSupport` and `NumericUpDownWithCommandSupport`.
 - 🚪 **Form Commands**: Reusable commands to open modeless forms with lifetime & activate management (`OpenFormCommand<TForm>`) and close forms (`CloseFormCommand`).
 - 🎯 **WinForms Configuration**: Specialized configs for UI types with custom serialization (`ColorConfig`, `FontConfig`, `IconConfig`, `ImageConfig` via `WinFormsConfigFactory`), while standard types (`Point`, `Size`, `FormWindowState`) are supported directly through `ConfigFactory.GetConfig<T>()`.
 
@@ -53,8 +53,9 @@ public class MainForm : LocalizableForm
 ```csharp
 using Coding4Coffee.WinForms.Commands;
 using Coding4Coffee.WinForms.Commands.Controls;
+using Coding4Coffee.WinForms.Commands.Extensions;
 
-// Bind an ICommand to any ButtonBase or ToolStripMenuItem
+// Bind an ICommand to a Button or ToolStripMenuItem
 var saveButton = new Button();
 saveButton.BindCommand(saveCommand, commandParameter);
 
@@ -166,17 +167,18 @@ The library provides localizable versions of 45 major WinForms controls:
 ## Command-Enabled Controls
 
 ### Built-in Extensions
-- `ButtonBase.BindCommand()` - Extension for Button, CheckBox, RadioButton, etc.
+- `Button.BindCommand()` - Extension for buttons
 - `ToolStripMenuItem.BindCommand()` - Extension for menu items
 
-### Custom Command-Support Controls (21)
+### Custom Command-Support Controls (22)
 
 #### Standard Desktop Controls (3)
 - `DateTimePickerWithCommandSupport` - Executes command on value change
 - `NumericUpDownWithCommandSupport` - Executes command on value change
 - `TrackBarWithCommandSupport` - Executes command on value change
 
-#### Localizable Desktop Controls (12)
+#### Localizable Desktop Controls (13)
+- `LocalizableButtonWithCommandSupport` - Rechecks `CanExecute` and updates `Enabled` when `CommandParameter` changes, unlike the native button. Changes inside the same parameter object still require `CanExecuteChanged`.
 - `LocalizableCheckBoxWithCommandSupport`
 - `LocalizableComboBoxWithCommandSupport` - Uses SelectionChangeCommitted for user-only changes + SelectedItem default
 - `LocalizableCheckedListBoxWithCommandSupport`
@@ -578,7 +580,7 @@ helpButton.BindCommand(helpCommand);
 - Subscribes to culture change events
 
 ### Command Extensions & Fluent API
-- `ButtonBase.BindCommand(ICommand command, object? parameter = null)` - Binds command to button
+- `Button.BindCommand(ICommand command, object? parameter = null)` - Binds command to button
 - `ToolStripMenuItem.BindCommand(ICommand command, object? parameter = null)` - Binds command to menu item
 - Custom controls provide type-specific `Bind*Command()` methods for fluent chaining:
   - Single commands: `BindCommand(ICommand, object?)`

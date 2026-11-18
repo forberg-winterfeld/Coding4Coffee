@@ -16,16 +16,11 @@ namespace Coding4Coffee.Basics.Tests
         /// <summary>
         /// Generic async command that returns a string result.
         /// </summary>
-        private class StringResultCommand : AsyncCommandBase<string>
+        private class StringResultCommand(string resultToReturn = "DefaultResult") : AsyncCommandBase<string>
         {
-            private readonly string _resultToReturn;
+            private readonly string _resultToReturn = resultToReturn;
 
             public int ExecutionCount { get; private set; }
-
-            public StringResultCommand(string resultToReturn = "DefaultResult")
-            {
-                _resultToReturn = resultToReturn;
-            }
 
             protected override async Task<string> ExecuteAsync(object? parameter, IProgress<string> progress, CancellationToken cancellationToken)
             {
@@ -342,10 +337,12 @@ namespace Coding4Coffee.Basics.Tests
         {
             // Arrange
             var command = new RetryableResultCommand(failCount: 2);
+            var completed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            command.ExecutionCompleted += (_, _) => completed.TrySetResult();
 
             // Act
             command.Execute(null);
-            await Task.Delay(150);
+            await completed.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
             // Assert
             Assert.True(command.HasResult, $"Expected HasResult to be true, Attempts: {command.AttemptCount}");
@@ -380,10 +377,10 @@ namespace Coding4Coffee.Basics.Tests
         {
             // Arrange
             var command = new IntegerProgressCommand(); // Use longer-running command
+            var completed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             bool startedFired = false;
-            bool completedFired = false;
             command.ExecutionStarted += (s, e) => startedFired = true;
-            command.ExecutionCompleted += (s, e) => completedFired = true;
+            command.ExecutionCompleted += (_, _) => completed.TrySetResult();
 
             // Act
             command.Execute(null);
@@ -393,8 +390,7 @@ namespace Coding4Coffee.Basics.Tests
             Assert.True(startedFired, "ExecutionStarted should have fired");
 
             // Wait for completion
-            await Task.Delay(150);
-            Assert.True(completedFired, "ExecutionCompleted should have fired");
+            await completed.Task.WaitAsync(TimeSpan.FromSeconds(5));
         }
 
         [Fact]

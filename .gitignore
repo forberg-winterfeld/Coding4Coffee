@@ -97,3 +97,4 @@ publish/
 .env.local
 launchSettings.json
 
+/scripts

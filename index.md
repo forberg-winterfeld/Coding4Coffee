@@ -2,7 +2,7 @@
 
 Welcome to the **Coding4Coffee** library documentation!
 
-Coding4Coffee provides lightweight, modern C# libraries for **Configuration**, **Localization**, and **MVVM-style Commands** in .NET 10 and Windows Forms applications.
+Coding4Coffee provides lightweight, modern C# libraries for **Configuration**, **Localization**, and **MVVM-style Commands** in .NET 10 and .NET 11 applications, including Windows Forms.
 
 ## Included Packages
 

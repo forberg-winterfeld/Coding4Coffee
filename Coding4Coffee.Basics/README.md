@@ -1,6 +1,6 @@
 # Coding4Coffee.Basics
 
-A lightweight, modern .NET 10 utility library providing strongly-typed configuration management, dynamic runtime localization, and reusable `ICommand` implementations.
+A lightweight, modern .NET 10 and .NET 11 utility library providing strongly-typed configuration management, dynamic runtime localization, and reusable `ICommand` implementations.
 
 ## Features
 

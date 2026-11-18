@@ -1,11 +1,11 @@
 # Coding4Coffee
 
-A comprehensive .NET 10 suite of libraries for building modern, localizable Windows Forms applications with strong MVVM support, configuration management, and command-based UI controls.
+A comprehensive .NET 10 and .NET 11 suite of libraries for building modern, localizable Windows Forms applications with strong MVVM support, configuration management, and command-based UI controls.
 
 ## 📦 Libraries
 
 ### [Coding4Coffee.Basics](./Coding4Coffee.Basics)
-A lightweight, modern .NET 10 utility library providing:
+A lightweight, modern .NET 10 and .NET 11 utility library providing:
 - **Configuration Management**: Strongly-typed configuration wrapper with JSON serialization and optional persistence
 - **Dynamic Localization**: Runtime culture switching with automatic UI updates
 - **MVVM Commands**: Ready-to-use `ICommand` implementations

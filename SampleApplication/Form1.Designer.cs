@@ -37,6 +37,7 @@
             ClientSize = new Size(800, 450);
             Name = "Form1";
             Text = "Form1";
+            TextResourceKey = "form1.caption";
             ResumeLayout(false);
         }
 

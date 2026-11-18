@@ -21,7 +21,9 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            10.0.x
+            11.0.x
 
       - name: Run Basics tests
         run: dotnet test Coding4Coffee.Basics.Tests/Coding4Coffee.Basics.Tests.csproj --configuration Release

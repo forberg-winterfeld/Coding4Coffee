@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net10.0-windows</TargetFramework>
+	<TargetFrameworks>net10.0-windows;net11.0-windows</TargetFrameworks>
 	  <UseWindowsForms>true</UseWindowsForms>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
@@ -9,11 +9,11 @@
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageTags>winforms;windows-forms;localization;mvvm;commands;data-binding</PackageTags>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-	<LicenseExpression>MIT</LicenseExpression>
-	<AssemblyVersion></AssemblyVersion>
-	<Version>2.0.0</Version>
-  </PropertyGroup>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<LicenseExpression>MIT</LicenseExpression>
+		<AssemblyVersion></AssemblyVersion>
+		<Version>2.0.1</Version>
+	</PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Coding4Coffee.Basics\Coding4Coffee.Basics.csproj" />

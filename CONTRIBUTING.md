@@ -10,7 +10,7 @@ Please review our [Code of Conduct](CODE_OF_CONDUCT.md) before participating in 
 
 ### Prerequisites
 
-- .NET 10 SDK or later
+- .NET 11 SDK and .NET 10 runtime (to build and test both target frameworks)
 - Visual Studio 2022 (Community/Professional/Enterprise) or Visual Studio Code
 - Git
 
