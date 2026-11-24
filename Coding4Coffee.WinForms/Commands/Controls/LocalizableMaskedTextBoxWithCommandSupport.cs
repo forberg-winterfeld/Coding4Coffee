@@ -10,9 +10,9 @@ namespace Coding4Coffee.WinForms.Commands.Controls
     /// </summary>
     /// <remarks>
     /// Provides two independent commands for different scenarios:
-    /// 1. <see cref="TextCommand"/>: Executes after the user pauses typing for <see cref="DebounceInterval"/> milliseconds.
-    ///    Useful for live validation or filtering based on formatted input.
-    /// 2. <see cref="MaskRejectionCommand"/>: Executes when the user attempts to enter characters that violate the mask.
+    /// 1. <see cref="TextCommand"/>: Executes after text changes stop for <see cref="DebounceInterval"/> milliseconds.
+    ///    User and programmatic changes, including localization, can restart the timer.
+    /// 2. <see cref="MaskRejectionCommand"/>: Executes when input is rejected by the mask.
     ///    Useful for error feedback or logging of invalid input attempts.
     /// Inherits from <see cref="LocalizableMaskedTextBox"/>, meaning dynamic localization applies to
     /// <c>Mask</c> and <c>Text</c> at runtime.
@@ -60,11 +60,11 @@ namespace Coding4Coffee.WinForms.Commands.Controls
 
         #region Text Command
         /// <summary>
-        /// Gets or sets the command to execute when valid text changes after the debounce interval.
+        /// Gets or sets the command to execute after text changes and the debounce interval elapses.
         /// </summary>
         /// <remarks>
-        /// Executed in response to <see cref="Control.TextChanged"/> event after <see cref="DebounceInterval"/> milliseconds of inactivity.
-        /// This command fires only for text changes that conform to the mask (rejected characters do not trigger this command).
+        /// The <see cref="Control.TextChanged"/> event restarts the timer, including for programmatic changes.
+        /// A rejected input that does not change the text does not itself restart the timer.
         /// Automatically synchronizes <see cref="Control.Enabled"/> based on <see cref="ICommand.CanExecute(object?)"/>,
         /// passing <see cref="TextCommandParameter"/> (or <see cref="TextBoxBase.Text"/> if <see cref="TextCommandParameter"/> is <see langword="null"/>).
         /// </remarks>
@@ -173,8 +173,9 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets an optional command parameter for <see cref="MaskRejectionCommand"/>.
         /// </summary>
         /// <remarks>
-        /// This parameter is passed to the command whenever mask input rejection occurs.
-        /// If <see langword="null"/>, the command still executes but with a null parameter.
+        /// This parameter is passed to the command when mask input is rejected.
+        /// If it is <see langword="null"/>, a null parameter is passed to <see cref="ICommand.CanExecute(object?)"/>
+        /// and, if permitted, to <see cref="ICommand.Execute(object?)"/>.
         /// </remarks>
         [Browsable(true)]
         [Category("Data")]
@@ -214,7 +215,12 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         {
             if (disposing)
             {
-                _debounceTimer?.Dispose();
+                TextCommand = null;
+                TextChanged -= MaskedTextBox_TextChanged;
+                MaskInputRejected -= MaskedTextBox_MaskInputRejected;
+                _debounceTimer.Stop();
+                _debounceTimer.Tick -= DebounceTimer_Tick;
+                _debounceTimer.Dispose();
             }
             base.Dispose(disposing);
         }

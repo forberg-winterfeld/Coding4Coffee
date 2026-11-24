@@ -1,7 +1,5 @@
 using Coding4Coffee.WinForms.Localization.Controls;
-using System;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace Coding4Coffee.WinForms.Commands.Controls

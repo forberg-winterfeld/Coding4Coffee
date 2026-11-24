@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Drawing;
 using Coding4Coffee.Basics.Configuration;
 
 namespace Coding4Coffee.WinForms.Configuration

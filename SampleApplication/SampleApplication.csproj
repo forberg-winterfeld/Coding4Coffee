@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Coding4Coffee.Basics\Coding4Coffee.Basics.csproj" />
     <ProjectReference Include="..\Coding4Coffee.WinForms\Coding4Coffee.WinForms.csproj" />
   </ItemGroup>
 

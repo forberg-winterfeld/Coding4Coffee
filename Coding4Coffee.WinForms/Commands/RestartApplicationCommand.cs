@@ -1,5 +1,4 @@
 using Coding4Coffee.Basics.Commands;
-using System.Windows.Input;
 
 namespace Coding4Coffee.WinForms.Commands
 {

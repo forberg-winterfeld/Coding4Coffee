@@ -1,5 +1,3 @@
-using System;
-
 namespace Coding4Coffee.Basics.Commands
 {
     /// <summary>
@@ -21,8 +19,8 @@ namespace Coding4Coffee.Basics.Commands
         /// Gets or sets a value indicating whether the exception has been handled by the subscriber.
         /// </summary>
         /// <remarks>
-        /// When set to <see langword="true"/>, the exception is considered handled and further processing may be skipped.
-        /// Set to <see langword="false"/> by default, meaning the exception is unhandled.
+        /// Defaults to <see langword="false"/>. This flag is available to subscribers and custom error handlers;
+        /// <see cref="AsyncCommandBase"/> does not inspect it.
         /// </remarks>
         public bool Handled { get; set; }
     }

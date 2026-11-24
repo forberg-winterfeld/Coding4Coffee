@@ -1,4 +1,3 @@
-using System.Drawing;
 using Coding4Coffee.Basics.Configuration;
 
 namespace Coding4Coffee.WinForms.Configuration
@@ -15,7 +14,10 @@ namespace Coding4Coffee.WinForms.Configuration
         /// Shadows <see cref="Config{TValue}.Value"/>. Icons are persisted as a Base64-encoded string representing the raw icon stream.
         /// If the stored string is empty, whitespace, or invalid Base64 icon data, getting this property returns <see langword="null"/>
         /// without throwing an exception. Similarly, if saving the icon fails, <see langword="null"/> is stored.
+        /// Each successful get creates a new icon that the caller must dispose. Setting the property does not
+        /// transfer ownership of the supplied icon.
         /// </remarks>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "WFO2000", Justification = "Each get intentionally creates an independent icon owned by the caller.")]
         public new Icon? Value
         {
             get
@@ -58,6 +60,7 @@ namespace Coding4Coffee.WinForms.Configuration
         /// <summary>
         /// Implicitly converts an <see cref="IconConfig"/> to a nullable <see cref="Icon"/>.
         /// </summary>
+        /// <remarks>Each successful conversion creates a new icon that the caller must dispose.</remarks>
         /// <param name="config">The <see cref="IconConfig"/> instance to convert.</param>
         /// <returns>The converted <see cref="Icon"/> value, or <see langword="null"/> if the configuration has no value or is invalid.</returns>
         public static implicit operator Icon?(IconConfig config) => config.Value;

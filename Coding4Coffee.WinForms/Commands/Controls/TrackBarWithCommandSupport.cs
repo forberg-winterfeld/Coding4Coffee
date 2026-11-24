@@ -4,8 +4,8 @@ using System.Windows.Input;
 namespace Coding4Coffee.WinForms.Commands.Controls
 {
     /// <summary>
-    /// A custom TrackBar control that integrates command binding support with an optional debounce delay.
-    /// Executes the bound command when the trackbar value changes.
+    /// A custom TrackBar control that integrates command binding support with a debounce delay.
+    /// Executes the bound command after scrolling pauses.
     /// </summary>
     /// <remarks>
     /// Debounces command execution during slider dragging using an internal timer set to <see cref="DebounceInterval"/> ms.
@@ -147,7 +147,10 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         {
             if (disposing)
             {
-                _debounceTimer?.Dispose();
+                Command = null;
+                _debounceTimer.Stop();
+                _debounceTimer.Tick -= DebounceTimer_Tick;
+                _debounceTimer.Dispose();
             }
             base.Dispose(disposing);
         }

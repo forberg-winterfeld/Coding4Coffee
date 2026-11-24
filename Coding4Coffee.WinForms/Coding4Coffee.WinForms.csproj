@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	<TargetFrameworks>net10.0-windows;net11.0-windows</TargetFrameworks>
@@ -12,7 +12,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<LicenseExpression>MIT</LicenseExpression>
 		<AssemblyVersion></AssemblyVersion>
-		<Version>2.0.2</Version>
+		<Version>2.1.0</Version>
 	</PropertyGroup>
 
   <ItemGroup>

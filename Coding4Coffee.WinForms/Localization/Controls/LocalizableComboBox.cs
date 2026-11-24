@@ -1,7 +1,5 @@
 using System.Collections;
-using System.ComponentModel;
 using Coding4Coffee.Basics.Localization;
-using Coding4Coffee.WinForms.Localization;
 
 namespace Coding4Coffee.WinForms.Localization.Controls
 {
@@ -13,7 +11,7 @@ namespace Coding4Coffee.WinForms.Localization.Controls
         /// <summary>
         /// Localizes the items of the ComboBox.
         /// </summary>
-        public void Localize()
+        public virtual void Localize()
         {
             if (DataSource is IEnumerable dataSourceCollection)
                 dataSourceCollection.LocalizeCollection();

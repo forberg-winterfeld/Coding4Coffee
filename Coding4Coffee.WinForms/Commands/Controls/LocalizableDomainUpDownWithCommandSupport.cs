@@ -107,5 +107,13 @@ namespace Coding4Coffee.WinForms.Commands.Controls
 
             return this;
         }
+
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                Command = null;
+            base.Dispose(disposing);
+        }
     }
 }

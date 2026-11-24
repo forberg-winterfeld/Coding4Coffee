@@ -1,7 +1,5 @@
 using Coding4Coffee.WinForms.Localization.Controls;
-using System;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace Coding4Coffee.WinForms.Commands.Controls
@@ -100,6 +98,14 @@ namespace Coding4Coffee.WinForms.Commands.Controls
             Command = command;
 
             return this;
+        }
+
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                Command = null;
+            base.Dispose(disposing);
         }
     }
 }

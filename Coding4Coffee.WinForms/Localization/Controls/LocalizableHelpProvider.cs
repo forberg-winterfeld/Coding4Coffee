@@ -1,8 +1,6 @@
 ﻿using Coding4Coffee.Basics.Localization;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 
 namespace Coding4Coffee.WinForms.Localization.Controls
 {

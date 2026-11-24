@@ -1,6 +1,5 @@
 using Coding4Coffee.WinForms.Localization.Controls;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace Coding4Coffee.WinForms.Commands.Controls
@@ -12,9 +11,9 @@ namespace Coding4Coffee.WinForms.Commands.Controls
     /// Provides seven independent command bindings for different DataGridView scenarios:
     /// 1. <see cref="CellClickCommand"/> - Single-click on a cell
     /// 2. <see cref="CellDoubleClickCommand"/> - Double-click on a cell
-    /// 3. <see cref="CellValueChangedCommand"/> - After cell value changes (with optional debounce)
+    /// 3. <see cref="CellValueChangedCommand"/> - After cell value changes (debounced)
     /// 4. <see cref="CellBeginEditCommand"/> - Before editing begins (cancellable)
-    /// 5. <see cref="CellEndEditCommand"/> - After editing, before commit (cancellable)
+    /// 5. <see cref="CellEndEditCommand"/> - After editing ends
     /// 6. <see cref="SelectionChangedCommand"/> - When selection changes
     /// 7. <see cref="RowHeaderClickCommand"/> - Row header click (typically selects entire row)
     /// 
@@ -24,6 +23,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
     public class LocalizableDataGridViewWithCommandSupport : LocalizableDataGridView
     {
         private readonly System.Windows.Forms.Timer _cellValueChangedDebounceTimer;
+        private DataGridViewCell? _pendingChangedCell;
 
         #region Command Fields
         private ICommand? _cellClickCommand;
@@ -73,8 +73,8 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the delay in milliseconds before the <see cref="CellValueChangedCommand"/> executes after a value change.
         /// </summary>
         /// <remarks>
-        /// Any value smaller than 50 milliseconds is clamped to 50 milliseconds to maintain responsive UI performance.
-        /// Set to exactly 50 to disable the debounce delay. Negative values are clamped to 50.
+        /// The default is 300 milliseconds. Values smaller than 50 milliseconds are clamped to 50 milliseconds;
+        /// the debounce cannot be disabled. Execution requires a running WinForms message loop.
         /// </remarks>
         [Browsable(true)]
         [Category("Behavior")]
@@ -150,7 +150,7 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the command executed when a cell is double-clicked.
         /// </summary>
         /// <remarks>
-        /// Executed in response to <see cref="DataGridView.CellDoubleClick"/> event, which occurs after CellClick but before <see cref="DataGridView.CellBeginEdit"/>.
+        /// Executed in response to the <see cref="DataGridView.CellDoubleClick"/> event for a data cell.
         /// Useful for opening detail views, inline editors, or confirming selections.
         /// </remarks>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -209,22 +209,32 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the command executed after a cell value changes.
         /// </summary>
         /// <remarks>
-        /// Executed in response to <see cref="DataGridView.CellValueChanged"/> event after <see cref="CellValueChangedDebounceInterval"/> milliseconds of inactivity.
-        /// This provides deferred value persistence, similar to TextBox debouncing. Fires after <see cref="CellEndEditCommand"/>.
-        /// Set <see cref="CellValueChangedDebounceInterval"/> to 0 for immediate execution.
+        /// The <see cref="DataGridView.CellValueChanged"/> event restarts a single debounce timer, including for
+        /// programmatic changes. When it elapses, the command uses the last changed cell, even if the current
+        /// selection has changed. Changes to other cells during the interval replace the pending cell. If that cell
+        /// is no longer in the grid, no command is executed. Replacing or removing the command, or disposing the grid,
+        /// cancels pending work. At execution time, <see cref="ICommand.CanExecute(object?)"/> must return true.
         /// </remarks>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? CellValueChangedCommand
         {
             get => _cellValueChangedCommand;
-            set => _cellValueChangedCommand = value;
+            set
+            {
+                if (ReferenceEquals(_cellValueChangedCommand, value))
+                    return;
+                _cellValueChangedDebounceTimer.Stop();
+                _pendingChangedCell = null;
+                _cellValueChangedCommand = value;
+            }
         }
 
         /// <summary>
         /// Gets or sets the optional parameter for <see cref="CellValueChangedCommand"/>.
         /// </summary>
         /// <remarks>
-        /// If <see langword="null"/>, the changed cell's value is used; if that is null, the parent row's <see cref="DataGridViewRow.DataBoundItem"/> is used.
+        /// If <see langword="null"/>, the last changed cell's value is used when the timer elapses; if that is null,
+        /// the parent row's <see cref="DataGridViewRow.DataBoundItem"/> is used. The parameter is resolved at execution time.
         /// </remarks>
         [Browsable(true)]
         [Category("Data")]
@@ -238,41 +248,27 @@ namespace Coding4Coffee.WinForms.Commands.Controls
 
         private void DataGridView_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
-            // Restart debounce timer on every value change
+            if (_cellValueChangedCommand == null || e.RowIndex < 0 || e.RowIndex >= Rows.Count ||
+                e.ColumnIndex < 0 || e.ColumnIndex >= Columns.Count)
+                return;
+
+            _pendingChangedCell = Rows[e.RowIndex].Cells[e.ColumnIndex];
             _cellValueChangedDebounceTimer.Stop();
-            if (CellValueChangedDebounceInterval > 0)
-            {
-                _cellValueChangedDebounceTimer.Start();
-            }
-            else
-            {
-                // Execute immediately if debounce is disabled
-                ExecuteCellValueChangedCommand(e);
-            }
+            _cellValueChangedDebounceTimer.Start();
         }
 
         private void CellValueChangedDebounceTimer_Tick(object? sender, EventArgs e)
         {
             _cellValueChangedDebounceTimer.Stop();
+            var cell = _pendingChangedCell;
+            _pendingChangedCell = null;
+            var command = _cellValueChangedCommand;
+            if (command == null || cell?.DataGridView != this || cell.OwningRow == null || cell.OwningColumn == null)
+                return;
 
-            if (CurrentCell != null)
-            {
-                ExecuteCellValueChangedCommand(new DataGridViewCellEventArgs(CurrentCell.ColumnIndex, CurrentCell.RowIndex));
-            }
-        }
-
-        private void ExecuteCellValueChangedCommand(DataGridViewCellEventArgs e)
-        {
-            if (_cellValueChangedCommand != null && e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < Rows.Count)
-            {
-                var cell = Rows[e.RowIndex].Cells[e.ColumnIndex];
-                var parameter = _cellValueChangedCommandParameter ?? cell.Value ?? Rows[e.RowIndex].DataBoundItem;
-
-                if (_cellValueChangedCommand.CanExecute(parameter))
-                {
-                    _cellValueChangedCommand.Execute(parameter);
-                }
-            }
+            var parameter = _cellValueChangedCommandParameter ?? cell.Value ?? cell.OwningRow.DataBoundItem;
+            if (command.CanExecute(parameter))
+                command.Execute(parameter);
         }
 
         /// <summary>
@@ -356,14 +352,12 @@ namespace Coding4Coffee.WinForms.Commands.Controls
 
         #region CellEndEdit Command
         /// <summary>
-        /// Gets or sets the command executed after a cell finishes editing but BEFORE the value is committed.
+        /// Gets or sets the command executed when a cell finishes editing.
         /// </summary>
         /// <remarks>
-        /// Executed in response to <see cref="DataGridView.CellEndEdit"/> event AFTER the user exits edit mode (presses Enter, Tab, or loses focus)
-        /// but BEFORE the new value is committed to the cell. This is the post-edit validation point.
-        /// If the command cannot execute (via <see cref="ICommand.CanExecute(object?)"/>), the edit can be rejected and the value reverted.
-        /// Useful for input validation, data transformation, or consistency checks before committing.
-        /// Note: Unlike <see cref="CellValueChangedCommand"/>, this fires on every edit exit, even if the value did not actually change.
+        /// Executed in response to <see cref="DataGridView.CellEndEdit"/> if
+        /// <see cref="ICommand.CanExecute(object?)"/> returns <see langword="true"/>.
+        /// This event does not cancel editing or revert the cell value when the command cannot execute.
         /// </remarks>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? CellEndEditCommand
@@ -376,11 +370,11 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the optional parameter for <see cref="CellEndEditCommand"/>.
         /// </summary>
         /// <remarks>
-        /// If <see langword="null"/>, the cell being edited is used as the parameter.
+        /// If <see langword="null"/>, the cell that finished editing is used as the parameter.
         /// </remarks>
         [Browsable(true)]
         [Category("Data")]
-        [Description("The parameter to pass to the CellEndEditCommand on CellEndEdit event (after edit, before commit). Defaults to the DataGridViewCell.")]
+        [Description("The parameter to pass to the CellEndEditCommand on CellEndEdit. Defaults to the DataGridViewCell.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public object? CellEndEditCommandParameter
         {
@@ -436,7 +430,8 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the optional parameter for <see cref="SelectionChangedCommand"/>.
         /// </summary>
         /// <remarks>
-        /// If <see langword="null"/>, the currently selected cell (or first selected row if row selection) is used.
+        /// If <see langword="null"/>, <see cref="DataGridView.CurrentCell"/> is used, or the first selected row
+        /// if there is no current cell. If neither exists, the parameter is <see langword="null"/>.
         /// </remarks>
         [Browsable(true)]
         [Category("Data")]
@@ -489,10 +484,9 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the command executed when a row header is clicked.
         /// </summary>
         /// <remarks>
-        /// Executed in response to <see cref="DataGridView.RowHeaderMouseClick"/> event.
-        /// Standard DataGridView behavior selects the entire row automatically. This command fires during that selection,
-        /// allowing you to perform additional actions like context menu display or bulk operation triggers.
-        /// Right-click row header clicks can be distinguished by button detection in subclassed handlers if needed.
+        /// Executed in response to the <see cref="DataGridView.RowHeaderMouseClick"/> event for a data row.
+        /// Row selection depends on the grid's selection mode. The command parameter does not include mouse button data;
+        /// use the event directly when that information is needed.
         /// </remarks>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? RowHeaderClickCommand
@@ -550,7 +544,11 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         {
             if (disposing)
             {
-                _cellValueChangedDebounceTimer?.Dispose();
+                CellValueChanged -= DataGridView_CellValueChanged;
+                _pendingChangedCell = null;
+                _cellValueChangedDebounceTimer.Stop();
+                _cellValueChangedDebounceTimer.Tick -= CellValueChangedDebounceTimer_Tick;
+                _cellValueChangedDebounceTimer.Dispose();
             }
             base.Dispose(disposing);
         }

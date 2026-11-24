@@ -9,7 +9,7 @@
     <PackageTags>configuration;localization;mvvm;commands;dotnet</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <LicenseExpression>MIT</LicenseExpression>
-    <Version>2.0.2</Version>
+    <Version>2.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

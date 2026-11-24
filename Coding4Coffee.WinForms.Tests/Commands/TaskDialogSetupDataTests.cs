@@ -57,7 +57,7 @@ namespace Coding4Coffee.WinForms.Tests.Commands
 
             var setupData = new TaskDialogSetupData
             {
-                CustomButtons = new List<TaskDialogButton> { customButton1, customButton2 }
+                CustomButtons = [customButton1, customButton2]
             };
 
             var page = new TaskDialogPage();

@@ -9,14 +9,9 @@ namespace Coding4Coffee.Basics.Tests
 {
     public class LocalizationTests
     {
-        private class InMemoryResourceManager : ResourceManager
+        private class InMemoryResourceManager(Dictionary<string, string> resources) : ResourceManager
         {
-            private readonly Dictionary<string, string> _resources;
-
-            public InMemoryResourceManager(Dictionary<string, string> resources)
-            {
-                _resources = resources;
-            }
+            private readonly Dictionary<string, string> _resources = resources;
 
             public override string? GetString(string name, CultureInfo? culture)
             {
@@ -93,7 +88,7 @@ namespace Coding4Coffee.Basics.Tests
         {
             var initialCulture = LocalizationManager.CurrentCulture;
             bool eventFired = false;
-            EventHandler handler = (s, e) => eventFired = true;
+            void handler(object? s, EventArgs e) => eventFired = true;
             LocalizationManager.CultureChanged += handler;
 
             try
@@ -130,6 +125,100 @@ namespace Coding4Coffee.Basics.Tests
                 var config = ConfigFactory.GetCultureInfoConfig(key, isTransient: true);
                 Assert.NotNull(config.Value);
                 Assert.Equal("es-ES", config.Value.Name);
+            }
+            finally
+            {
+                LocalizationManager.CultureConfigKey = string.Empty;
+                LocalizationManager.CurrentCulture = initialCulture;
+            }
+        }
+
+        [Fact]
+        public void LocalizationManager_ConfigChangesApplyCultureAndNotifyOnce()
+        {
+            var initialCulture = LocalizationManager.CurrentCulture;
+            string key = $"AppCulture_{Guid.NewGuid()}";
+            var config = ConfigFactory.GetCultureInfoConfig(key, isTransient: true);
+            int notifications = 0;
+            void handler(object? _1, EventArgs _2) => notifications++;
+            try
+            {
+                LocalizationManager.CultureConfigKey = key;
+                LocalizationManager.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+                LocalizationManager.CultureChanged += handler;
+                ConfigFactory.GetConfig<string>(key).Value = "de-DE";
+                Assert.Equal("de-DE", LocalizationManager.CurrentCulture.Name);
+                Assert.Equal("de-DE", CultureInfo.CurrentCulture.Name);
+                Assert.Equal(1, notifications);
+                LocalizationManager.CurrentCulture = CultureInfo.GetCultureInfo("fr-FR");
+                Assert.Equal("fr-FR", config.Value?.Name);
+                Assert.Equal(2, notifications);
+                LocalizationManager.ResetToSystemCulture(CultureInfo.GetCultureInfo("en-US"));
+                Assert.Null(config.Value);
+                Assert.Equal("en-US", LocalizationManager.CurrentCulture.Name);
+                Assert.Equal(3, notifications);
+            }
+            finally
+            {
+                LocalizationManager.CultureChanged -= handler;
+                LocalizationManager.CultureConfigKey = string.Empty;
+                LocalizationManager.CurrentCulture = initialCulture;
+            }
+        }
+
+        [Fact]
+        public void LocalizationManager_RebindingDetachesOldConfigAndNullKeepsCurrentCulture()
+        {
+            var initialCulture = LocalizationManager.CurrentCulture;
+            var oldConfig = ConfigFactory.GetCultureInfoConfig($"AppCulture_{Guid.NewGuid()}", isTransient: true);
+            var newConfig = ConfigFactory.GetCultureInfoConfig($"AppCulture_{Guid.NewGuid()}", isTransient: true);
+            oldConfig.Value = CultureInfo.GetCultureInfo("de-DE");
+            newConfig.Value = CultureInfo.GetCultureInfo("fr-FR");
+            int notifications = 0;
+            void handler(object? _1, EventArgs _2) => notifications++;
+            try
+            {
+                LocalizationManager.CultureConfigKey = oldConfig.Key;
+                Assert.Equal("de-DE", LocalizationManager.CurrentCulture.Name);
+                LocalizationManager.CultureConfigKey = newConfig.Key;
+                Assert.Equal("fr-FR", LocalizationManager.CurrentCulture.Name);
+                LocalizationManager.CultureChanged += handler;
+                oldConfig.Value = CultureInfo.GetCultureInfo("ja-JP");
+                Assert.Equal("fr-FR", LocalizationManager.CurrentCulture.Name);
+                Assert.Equal(0, notifications);
+                newConfig.Value = null;
+                Assert.Equal("fr-FR", LocalizationManager.CurrentCulture.Name);
+                Assert.False(LocalizationManager.HasConfiguredCulture);
+                Assert.Equal(1, notifications);
+                LocalizationManager.CultureConfigKey = string.Empty;
+                newConfig.Value = CultureInfo.GetCultureInfo("en-US");
+                Assert.Equal("fr-FR", LocalizationManager.CurrentCulture.Name);
+                Assert.Equal(1, notifications);
+            }
+            finally
+            {
+                LocalizationManager.CultureChanged -= handler;
+                LocalizationManager.CultureConfigKey = string.Empty;
+                LocalizationManager.CurrentCulture = initialCulture;
+            }
+        }
+
+        [Fact]
+        public void LocalizationManager_InvalidBindingReportsErrorAndKeepsPreviousBinding()
+        {
+            var initialCulture = LocalizationManager.CurrentCulture;
+            var config = ConfigFactory.GetCultureInfoConfig($"AppCulture_{Guid.NewGuid()}", isTransient: true);
+            var incompatibleKey = $"AppCulture_{Guid.NewGuid()}";
+            ConfigFactory.GetConfig<int>(incompatibleKey, isTransient: true);
+            try
+            {
+                LocalizationManager.CultureConfigKey = config.Key;
+                Assert.Throws<InvalidOperationException>(() => LocalizationManager.CultureConfigKey = incompatibleKey);
+                Assert.Equal(config.Key, LocalizationManager.CultureConfigKey);
+                config.Value = CultureInfo.GetCultureInfo("de-DE");
+                Assert.Equal("de-DE", LocalizationManager.CurrentCulture.Name);
+                Assert.Throws<CultureNotFoundException>(() => ConfigFactory.GetConfig<string>(config.Key).Value = "invalid_culture_name");
+                Assert.Equal("de-DE", LocalizationManager.CurrentCulture.Name);
             }
             finally
             {
@@ -176,7 +265,7 @@ namespace Coding4Coffee.Basics.Tests
                 Assert.Equal("ja-JP", LocalizationManager.CurrentCulture.Name);
 
                 bool eventFired = false;
-                EventHandler handler = (s, e) => eventFired = true;
+                void handler(object? s, EventArgs e) => eventFired = true;
                 LocalizationManager.CultureChanged += handler;
 
                 try

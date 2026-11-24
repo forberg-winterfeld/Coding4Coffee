@@ -33,15 +33,10 @@ namespace Coding4Coffee.Basics.Tests
         /// <summary>
         /// Async command that throws an exception.
         /// </summary>
-        private class FailingAsyncCommand : AsyncCommandBase
+        private class FailingAsyncCommand(Exception exceptionToThrow) : AsyncCommandBase
         {
-            private readonly Exception _exceptionToThrow;
+            private readonly Exception _exceptionToThrow = exceptionToThrow ?? new InvalidOperationException("Test error");
             public int AttemptCount { get; private set; }
-
-            public FailingAsyncCommand(Exception exceptionToThrow)
-            {
-                _exceptionToThrow = exceptionToThrow ?? new InvalidOperationException("Test error");
-            }
 
             protected override async Task ExecuteAsync(object? parameter, CancellationToken cancellationToken)
             {
@@ -199,16 +194,13 @@ namespace Coding4Coffee.Basics.Tests
         public void CanExecute_ReturnsFalse_WhenExecuting()
         {
             // Arrange
-            var command = new SimpleAsyncCommand();
-            bool canExecuteWhileRunning = false;
-
             // Use a longer-running command to make timing reliable
             var longRunningCommand = new CancellableAsyncCommand();
 
             // Act
             longRunningCommand.Execute(null);
             Thread.Sleep(10); // Let it start
-            canExecuteWhileRunning = longRunningCommand.CanExecute(null); // Should be false while executing
+            bool canExecuteWhileRunning = longRunningCommand.CanExecute(null);
 
             // Cleanup
             longRunningCommand.Cancel();
@@ -221,6 +213,68 @@ namespace Coding4Coffee.Basics.Tests
         #endregion
 
         #region Lifecycle Events Tests
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Execute_StartupNotificationThrows_ReleasesStateAndPropagatesException(bool throwOnCanExecuteChanged)
+        {
+            var command = new SimpleAsyncCommand();
+            var expected = new InvalidOperationException("Startup failed");
+            var states = new List<bool>();
+            EventHandler canExecuteChanged = (_, _) =>
+            {
+                states.Add(command.IsExecuting);
+                if (throwOnCanExecuteChanged && command.IsExecuting)
+                    throw expected;
+            };
+            EventHandler executionStarted = (_, _) => throw expected;
+            command.CanExecuteChanged += canExecuteChanged;
+            if (!throwOnCanExecuteChanged)
+                command.ExecutionStarted += executionStarted;
+
+            var context = new CapturingSynchronizationContext();
+            var originalContext = SynchronizationContext.Current;
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(context);
+                command.Execute(null);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(originalContext);
+            }
+
+            Assert.False(command.IsExecuting);
+            Assert.True(command.CanExecute(null));
+            Assert.Equal(new[] { true, false }, states);
+            Assert.Equal(0, command.ExecutionCount);
+            Assert.Same(expected, Assert.Throws<InvalidOperationException>(context.Dispatch));
+
+            command.CanExecuteChanged -= canExecuteChanged;
+            command.ExecutionStarted -= executionStarted;
+            command.Execute(null);
+            Assert.Equal(1, command.ExecutionCount);
+            Assert.False(command.IsExecuting);
+        }
+
+        private sealed class CapturingSynchronizationContext : SynchronizationContext
+        {
+            private SendOrPostCallback? _callback;
+            private object? _state;
+
+            public override void Post(SendOrPostCallback callback, object? state)
+            {
+                _callback = callback;
+                _state = state;
+            }
+
+            public void Dispatch()
+            {
+                Assert.NotNull(_callback);
+                _callback(_state);
+            }
+        }
 
         [Fact]
         public async Task ExecutionStarted_RaisesEvent_WhenExecutionBegins()
@@ -294,7 +348,7 @@ namespace Coding4Coffee.Basics.Tests
             await Task.Delay(50);
 
             // Assert
-            Assert.Equal(new[] { "Started", "Completed" }, eventSequence);
+            Assert.Collection(eventSequence, item => Assert.Equal("Started", item), item => Assert.Equal("Completed", item));
         }
 
         [Fact]
@@ -348,7 +402,6 @@ namespace Coding4Coffee.Basics.Tests
         {
             // Arrange
             var command = new ErrorHandlingAsyncCommand();
-            var exception = new InvalidOperationException("Test");
 
             // Act
             command.Execute(null);

@@ -9,46 +9,74 @@ namespace Coding4Coffee.Basics.Localization
     public static class LocalizationManager
     {
         private static string _cultureConfigKey = string.Empty;
+        private static CultureInfoConfig? _cultureConfig;
+        private static bool _updatingConfig;
 
         /// <summary>
         /// Gets or sets the configuration key used to save/load the culture.
         /// </summary>
+        /// <remarks>
+        /// The configured culture is applied immediately and subsequent configuration changes are observed.
+        /// An empty key removes the binding. Clearing the configuration value retains the current culture.
+        /// Set the key and change its configuration on the UI thread when UI controls subscribe to culture changes.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">The key is already associated with a different configuration type.</exception>
+        /// <exception cref="CultureNotFoundException">The configured culture name is invalid.</exception>
         public static string CultureConfigKey
         {
             get => _cultureConfigKey;
             set
             {
-                if (_cultureConfigKey != value)
-                {
-                    _cultureConfigKey = value;
-                    LoadCultureFromConfig();
-                }
+                if (_cultureConfigKey == value)
+                    return;
+
+                var config = string.IsNullOrWhiteSpace(value) ? null : ConfigFactory.GetCultureInfoConfig(value);
+                var culture = config?.Value;
+                _cultureConfig?.ValueChanged -= CultureConfig_ValueChanged;
+                _cultureConfig = config;
+                _cultureConfigKey = value;
+                _cultureConfig?.ValueChanged += CultureConfig_ValueChanged;
+
+                if (culture != null && ApplyCulture(culture))
+                    CultureChanged?.Invoke(null, EventArgs.Empty);
             }
         }
 
-        static LocalizationManager() => LoadCultureFromConfig();
-
-        private static void LoadCultureFromConfig()
+        private static void CultureConfig_ValueChanged(object? sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(CultureConfigKey)) return;
+            if (_updatingConfig)
+                return;
 
+            var culture = _cultureConfig?.Value;
+            if (culture != null)
+                ApplyCulture(culture);
+            CultureChanged?.Invoke(null, EventArgs.Empty);
+        }
+
+        private static bool ApplyCulture(CultureInfo culture)
+        {
+            if (CultureInfo.CurrentUICulture.Name == culture.Name)
+                return false;
+
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
+            return true;
+        }
+
+        private static void SetConfigValue(CultureInfo? culture)
+        {
+            if (_cultureConfig == null)
+                return;
+
+            bool wasUpdating = _updatingConfig;
+            _updatingConfig = true;
             try
             {
-                var config = ConfigFactory.GetCultureInfoConfig(CultureConfigKey);
-                if (config.HasValue)
-                {
-                    var culture = config.Value;
-                    if (culture != null && CultureInfo.CurrentUICulture.Name != culture.Name)
-                    {
-                        CultureInfo.CurrentCulture = culture;
-                        CultureInfo.CurrentUICulture = culture;
-                        CultureChanged?.Invoke(null, EventArgs.Empty);
-                    }
-                }
+                _cultureConfig.Value = culture;
             }
-            catch
+            finally
             {
-                // Fallback / ignore if configuration or settings are not yet initialized
+                _updatingConfig = wasUpdating;
             }
         }
 
@@ -56,23 +84,7 @@ namespace Coding4Coffee.Basics.Localization
         /// Gets a value indicating whether a specific culture is saved in the configuration.
         /// Returns <see langword="false"/> if no culture has been explicitly configured.
         /// </summary>
-        public static bool HasConfiguredCulture
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(CultureConfigKey))
-                    return false;
-
-                try
-                {
-                    return ConfigFactory.GetCultureInfoConfig(CultureConfigKey).HasValue;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
+        public static bool HasConfiguredCulture => _cultureConfig?.HasValue == true;
 
         /// <summary>
         /// Resets the culture to the system default UI culture and clears any configured culture from settings.
@@ -84,67 +96,32 @@ namespace Coding4Coffee.Basics.Localization
         {
             var targetCulture = fallbackCulture ?? CultureInfo.InstalledUICulture;
 
-            bool cultureConfigCleared = false;
-            if (!string.IsNullOrWhiteSpace(CultureConfigKey))
-            {
-                try
-                {
-                    var config = ConfigFactory.GetCultureInfoConfig(CultureConfigKey);
-                    if (config.HasValue)
-                    {
-                        config.Value = null;
-                        cultureConfigCleared = true;
-                    }
-                }
-                catch
-                {
-                    // Ignore if settings are not writable or not initialized
-                }
-            }
+            bool cultureConfigCleared = _cultureConfig?.HasValue == true;
+            if (cultureConfigCleared)
+                SetConfigValue(null);
 
-            bool cultureChanged = CultureInfo.CurrentUICulture.Name != targetCulture.Name;
-            if (cultureChanged)
-            {
-                CultureInfo.CurrentCulture = targetCulture;
-                CultureInfo.CurrentUICulture = targetCulture;
-            }
-
+            bool cultureChanged = ApplyCulture(targetCulture);
             if (cultureChanged || cultureConfigCleared)
-            {
                 CultureChanged?.Invoke(null, EventArgs.Empty);
-            }
         }
 
         /// <summary>
-        /// Event raised when the current culture changes.
+        /// Event raised when the current culture or its configured value changes.
         /// </summary>
+        /// <remarks>Handlers run synchronously on the thread that made the change.</remarks>
         public static event EventHandler? CultureChanged;
 
         /// <summary>
-        /// Gets or sets the current UI culture of the application.
+        /// Gets or sets the current UI culture on the calling thread.
         /// </summary>
         public static CultureInfo CurrentCulture
         {
             get => CultureInfo.CurrentUICulture;
             set
             {
-                if (CultureInfo.CurrentUICulture.Name != value.Name)
+                if (ApplyCulture(value))
                 {
-                    CultureInfo.CurrentCulture = value;
-                    CultureInfo.CurrentUICulture = value;
-
-                    if (!string.IsNullOrWhiteSpace(CultureConfigKey))
-                    {
-                        try
-                        {
-                            ConfigFactory.GetCultureInfoConfig(CultureConfigKey).Value = value;
-                        }
-                        catch
-                        {
-                            // Ignore if settings are not writable or not initialized
-                        }
-                    }
-
+                    SetConfigValue(value);
                     CultureChanged?.Invoke(null, EventArgs.Empty);
                 }
             }

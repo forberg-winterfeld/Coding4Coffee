@@ -8,7 +8,8 @@ namespace Coding4Coffee.WinForms.Commands.Controls
     /// A localizable ToolStripTextBox control that integrates command binding support with a debounce delay on text changes.
     /// </summary>
     /// <remarks>
-    /// Executes the bound command after the user pauses typing for the duration of <see cref="DebounceInterval"/>.
+    /// Executes the bound command after text changes stop for the duration of <see cref="DebounceInterval"/>.
+    /// Both user input and programmatic text changes restart the timer.
     /// </remarks>
     public class LocalizableToolStripTextBoxWithCommandSupport : LocalizableToolStripTextBox
     {
@@ -50,9 +51,8 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// </summary>
         /// <remarks>
         /// Shadows the inherited <see cref="ToolStripItem.Command"/> property intentionally.
-        /// Unlike immediate action controls, text entry is debounced using an internal timer set to
-        /// <see cref="DebounceInterval"/> ms. Each keystroke restarts the timer. The command executes
-        /// only after typing ceases for the interval duration.
+        /// Text changes are debounced using an internal timer set to <see cref="DebounceInterval"/> ms.
+        /// Each text change restarts the timer, and the command executes only after changes cease for that interval.
         /// Automatically synchronizes <see cref="ToolStripItem.Enabled"/> based on <see cref="ICommand.CanExecute(object?)"/>,
         /// passing <see cref="CommandParameter"/> (or <see cref="TextBox.Text"/> if <see cref="CommandParameter"/> is <see langword="null"/>).
         /// </remarks>
@@ -149,7 +149,10 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         {
             if (disposing)
             {
-                _debounceTimer?.Dispose();
+                Command = null;
+                _debounceTimer.Stop();
+                _debounceTimer.Tick -= DebounceTimer_Tick;
+                _debounceTimer.Dispose();
             }
 
             base.Dispose(disposing);

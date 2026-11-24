@@ -1,6 +1,5 @@
 using Coding4Coffee.WinForms.Localization.Controls;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace Coding4Coffee.WinForms.Commands.Controls
@@ -11,8 +10,8 @@ namespace Coding4Coffee.WinForms.Commands.Controls
     /// <remarks>
     /// Executes the bound command when the checked state of an item changes via the <see cref="CheckedListBox.ItemCheck"/> event.
     /// Inherits from <see cref="LocalizableCheckedListBox"/>, meaning dynamic localization applies to items at runtime.
-    /// For each checked item change, if no explicit parameter is configured, the parameter defaults to the affected 
-    /// <see cref="object.ToString()"/> representation of the item (typically the item's Text or display value).
+    /// If no explicit parameter is configured, the affected item itself is passed to the command.
+    /// The <see cref="CheckedListBox.ItemCheck"/> event occurs before the new check state is applied.
     /// Use this control for multi-select scenarios such as permission management, filtering, or bulk operations.
     /// </remarks>
     public class LocalizableCheckedListBoxWithCommandSupport : LocalizableCheckedListBox
@@ -32,8 +31,8 @@ namespace Coding4Coffee.WinForms.Commands.Controls
         /// Gets or sets the command to execute when an item's checked state changes.
         /// </summary>
         /// <remarks>
-        /// Executed in response to <see cref="CheckedListBox.ItemCheck"/>.
-        /// The command receives the item at the changed index.
+        /// Executed in response to <see cref="CheckedListBox.ItemCheck"/> when the command can execute.
+        /// The command receives <see cref="CommandParameter"/>, or the item at the changed index if it is null.
         /// </remarks>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public ICommand? Command

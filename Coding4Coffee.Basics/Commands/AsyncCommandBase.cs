@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace Coding4Coffee.Basics.Commands
 {
@@ -65,7 +62,7 @@ namespace Coding4Coffee.Basics.Commands
         }
 
         /// <summary>
-        /// Gets or sets the initial delay before the first retry attempt.
+        /// Gets the initial delay before the first retry attempt.
         /// </summary>
         /// <remarks>
         /// Each subsequent retry doubles the delay (exponential backoff with base 2).
@@ -97,9 +94,15 @@ namespace Coding4Coffee.Basics.Commands
         protected virtual bool CanExecuteOverride(object? parameter) => true;
 
         /// <summary>
-        /// Defines the method to be called when the command is invoked. 
+        /// Defines the method to be called when the command is invoked.
         /// Manages the atomic execution lock, retry logic, cancellation, and async workflow.
         /// </summary>
+        /// <remarks>
+        /// Exceptions from startup notifications are not retried or reported through <see cref="ExecutionFailed"/>.
+        /// The execution state is reset and <see cref="CanExecuteChanged"/> is raised again before the exception
+        /// is propagated by the <see langword="async"/> <see langword="void"/> method. An exception from this final
+        /// notification can replace the original exception.
+        /// </remarks>
         /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to <see langword="null"/>.</param>
         public async void Execute(object? parameter)
         {
@@ -109,11 +112,11 @@ namespace Coding4Coffee.Basics.Commands
                 return;
             }
 
-            RaiseCanExecuteChanged();
-            OnExecutionStarted();
-
             try
             {
+                RaiseCanExecuteChanged();
+                OnExecutionStarted();
+
                 int retryCount = 0;
                 while (true)
                 {

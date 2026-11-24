@@ -107,7 +107,7 @@ namespace Coding4Coffee.WinForms.Tests.Commands
             button.RaiseClick();
 
             Assert.Same(button, result);
-            Assert.IsAssignableFrom<LocalizableButton>(button);
+            Assert.IsType<LocalizableButton>(button, exactMatch: false);
             Assert.Same(command, button.Command);
             Assert.Equal(1, command.ExecuteCount);
             Assert.Equal("selection", command.LastExecutedParameter);

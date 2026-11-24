@@ -54,12 +54,15 @@ namespace Coding4Coffee.WinForms.Tests
             var expectedIcon = SystemIcons.Information;
             config.Value = expectedIcon;
 
-            Assert.NotNull(config.Value);
-            Assert.Equal(expectedIcon.Width, config.Value.Width);
-            Assert.Equal(expectedIcon.Height, config.Value.Height);
+            using var icon = config.Value;
+            Assert.NotNull(icon);
+            Assert.Equal(expectedIcon.Width, icon.Width);
+            Assert.Equal(expectedIcon.Height, icon.Height);
 
-            Icon? implicitIcon = config;
+            using Icon? implicitIcon = config;
             Assert.NotNull(implicitIcon);
+            Assert.NotSame(icon, implicitIcon);
+            Assert.Equal(expectedIcon.Size, implicitIcon.Size);
 
             config.Value = null;
             Assert.Null(config.Value);
@@ -72,15 +75,27 @@ namespace Coding4Coffee.WinForms.Tests
             var config = WinFormsConfigFactory.GetImageConfig(key, isTransient: true);
             using var bitmap = new Bitmap(16, 16);
             bitmap.SetPixel(0, 0, Color.Red);
+            bitmap.SetPixel(1, 0, Color.FromArgb(128, 10, 20, 30));
 
             config.Value = bitmap;
 
-            Assert.NotNull(config.Value);
-            Assert.Equal(16, config.Value.Width);
-            Assert.Equal(16, config.Value.Height);
+            using var image = config.Value;
+            Assert.NotNull(image);
+            Assert.Equal(bitmap.Size, image.Size);
+            Assert.Equal(System.Drawing.Imaging.ImageFormat.Png.Guid, image.RawFormat.Guid);
 
-            Image? implicitImage = config;
+            using Image? implicitImage = config;
             Assert.NotNull(implicitImage);
+            Assert.NotSame(image, implicitImage);
+            image.Dispose();
+
+            using var output = new MemoryStream();
+            implicitImage.Save(output, System.Drawing.Imaging.ImageFormat.Png);
+            output.Position = 0;
+            using var roundTrip = new Bitmap(output);
+            Assert.Equal(bitmap.Size, roundTrip.Size);
+            Assert.Equal(bitmap.GetPixel(0, 0).ToArgb(), roundTrip.GetPixel(0, 0).ToArgb());
+            Assert.Equal(bitmap.GetPixel(1, 0).ToArgb(), roundTrip.GetPixel(1, 0).ToArgb());
 
             config.Value = null;
             Assert.Null(config.Value);

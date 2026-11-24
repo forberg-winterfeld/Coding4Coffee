@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using Coding4Coffee.Basics.Localization;
-using Coding4Coffee.WinForms.Localization;
 
 namespace Coding4Coffee.WinForms.Localization.Controls
 {
