@@ -11,6 +11,7 @@ namespace Coding4Coffee.Basics.Commands
     public abstract class AsyncCommandBase : ICommand
     {
         private int _isExecuting; // 0 = false (not executing), 1 = true (executing)
+        private readonly Lock _executionLock = new();
         private CancellationTokenSource? _currentCancellationTokenSource;
         private int _maxRetries = 0;
 
@@ -98,6 +99,9 @@ namespace Coding4Coffee.Basics.Commands
         /// Manages the atomic execution lock, retry logic, cancellation, and async workflow.
         /// </summary>
         /// <remarks>
+        /// A single cancellation token is used for all attempts and retry delays. Cancellation requested before an
+        /// attempt prevents that attempt from starting; a running attempt must observe the token to stop early.
+        /// Cancellation is reported through <see cref="ExecutionFailed"/> and is not retried.
         /// Exceptions from startup notifications are not retried or reported through <see cref="ExecutionFailed"/>.
         /// The execution state is reset and <see cref="CanExecuteChanged"/> is raised again before the exception
         /// is propagated by the <see langword="async"/> <see langword="void"/> method. An exception from this final
@@ -106,10 +110,16 @@ namespace Coding4Coffee.Basics.Commands
         /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to <see langword="null"/>.</param>
         public async void Execute(object? parameter)
         {
-            // Atomically try to transition from 0 to 1. If it was already 1 or conditions fail, abort.
-            if (!CanExecute(parameter) || Interlocked.CompareExchange(ref _isExecuting, 1, 0) != 0)
-            {
+            if (!CanExecute(parameter))
                 return;
+
+            CancellationTokenSource cancellationSource;
+            lock (_executionLock)
+            {
+                if (Interlocked.CompareExchange(ref _isExecuting, 1, 0) != 0)
+                    return;
+                cancellationSource = new CancellationTokenSource();
+                _currentCancellationTokenSource = cancellationSource;
             }
 
             try
@@ -122,8 +132,8 @@ namespace Coding4Coffee.Basics.Commands
                 {
                     try
                     {
-                        _currentCancellationTokenSource = new CancellationTokenSource();
-                        await ExecuteAsync(parameter, _currentCancellationTokenSource.Token);
+                        cancellationSource.Token.ThrowIfCancellationRequested();
+                        await ExecuteAsync(parameter, cancellationSource.Token);
                         OnExecutionCompleted();
                         return;
                     }
@@ -142,15 +152,26 @@ namespace Coding4Coffee.Basics.Commands
                             return;
                         }
 
-                        // Exponential backoff: delay *= 2 for each retry
                         int delayMs = (int)RetryDelay.TotalMilliseconds * (1 << (retryCount - 1));
-                        await Task.Delay(delayMs);
+                        try
+                        {
+                            await Task.Delay(delayMs, cancellationSource.Token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            OnError(new OperationCanceledException("Command execution was cancelled."), parameter);
+                            return;
+                        }
                     }
                 }
             }
             finally
             {
-                Interlocked.Exchange(ref _isExecuting, 0);
+                lock (_executionLock)
+                {
+                    _currentCancellationTokenSource = null;
+                    Interlocked.Exchange(ref _isExecuting, 0);
+                }
                 RaiseCanExecuteChanged();
             }
         }
@@ -218,14 +239,18 @@ namespace Coding4Coffee.Basics.Commands
         }
 
         /// <summary>
-        /// Cancels the currently executing command operation.
+        /// Requests cancellation of the currently executing command operation.
         /// </summary>
         /// <remarks>
-        /// If no operation is currently running, this method has no effect.
+        /// Cancellation is cooperative: the operation must observe its token. Cancellation also interrupts retry delays.
+        /// If no operation is currently running, this method has no effect. Cancellation callbacks run synchronously.
         /// </remarks>
         public virtual void Cancel()
         {
-            _currentCancellationTokenSource?.Cancel();
+            CancellationTokenSource? cancellationSource;
+            lock (_executionLock)
+                cancellationSource = _currentCancellationTokenSource;
+            cancellationSource?.Cancel();
         }
     }
 }

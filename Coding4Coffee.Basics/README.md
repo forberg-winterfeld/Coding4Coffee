@@ -6,7 +6,7 @@ A lightweight, modern .NET 10 and .NET 11 utility library providing strongly-typ
 
 - ⚙️ **Configuration Management**: Strongly-typed configuration wrapper (`Config<TValue>`) with JSON serialization and optional persistence via `SettingsBase`. Includes specialized handlers for 7 types with custom serialization needs (`CultureInfoConfig`, `DirectoryInfoConfig`, `FileInfoConfig`, `UriConfig`, `IPAddressConfig`, `VersionConfig`, `EncodingConfig`) and implicit cast operators.
 - 🌐 **Dynamic Localization**: Runtime culture switching via `LocalizationManager`, localizable strings (`LocalizableString`) with formatting and fallback values, and automatic culture change notifications.
-- ⚡ **MVVM Commands**: Ready-to-use `ICommand` implementations: `AlwaysExecutableCommand`, `AsyncCommandBase`, `AsyncCommandBase<T>`, `SetCultureCommand`, and framework-agnostic interfaces for application lifecycle management (`IExitApplicationCommand`, `IRestartApplicationCommand`).
+- ⚡ **MVVM Commands**: Ready-to-use `ICommand` implementations: `AlwaysExecutableCommand`, `AsyncCommandBase`, `AsyncCommandBase<T>`, `CancelAsyncCommand`, `SetCultureCommand`, and framework-agnostic interfaces for application lifecycle management (`IExitApplicationCommand`, `IRestartApplicationCommand`).
 - 🔁 **Enumerable Extensions**: `ForEach` helpers for synchronous iteration with cancellation support, including an overload that passes the token to each action.
 
 ## Installation
@@ -104,6 +104,21 @@ numbers.ForEach(number => Console.WriteLine(number), CancellationToken.None);
 ```
 
 Cancellation is observed between iterations and causes `OperationCanceledException` to be thrown. The token-aware overload also lets the action observe cancellation while it is running.
+
+### 4. Cancelling an asynchronous command
+
+Create a `CancelAsyncCommand` for an `AsyncCommandBase` or `AsyncCommandBase<T>` and bind it to a cancel button:
+
+```csharp
+using Coding4Coffee.Basics.Commands;
+
+// Keep both commands alive for as long as their bindings are in use.
+var cancelCommand = new CancelAsyncCommand(loadCommand);
+// With a WinForms LocalizableButtonWithCommandSupport:
+cancelButton.BindCommand(cancelCommand);
+```
+
+The cancel command is enabled while its target is executing, including after a cancellation request until execution ends. Cancellation is cooperative: a running `ExecuteAsync` implementation must observe its cancellation token. Cancellation before an attempt prevents it from starting; retry delays are also cancellable. By default, cancellation is reported through `ExecutionFailed` as an `OperationCanceledException`. Dispose the cancel command when it is no longer needed to detach its event subscription; disposal does not cancel the target. Notifications run on the thread that raises the target's event, so ensure UI bindings are updated on the appropriate UI thread.
 
 ## API Reference
 
