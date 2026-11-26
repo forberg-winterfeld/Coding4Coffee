@@ -12,7 +12,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<LicenseExpression>MIT</LicenseExpression>
 		<AssemblyVersion></AssemblyVersion>
-		<Version>2.1.0</Version>
+		<Version>2.2.0</Version>
 	</PropertyGroup>
 
   <ItemGroup>

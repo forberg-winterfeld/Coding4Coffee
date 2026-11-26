@@ -75,6 +75,19 @@ var numericUpDown = new NumericUpDownWithCommandSupport
 };
 ```
 
+### Temporarily reveal a password
+
+```csharp
+using Coding4Coffee.WinForms.Commands;
+using Coding4Coffee.WinForms.Commands.Extensions;
+
+// passwordTextBox is initially masked, for example with PasswordChar = '*'.
+var showPassword = new ShowPasswordCommand(passwordTextBox, delayMilliseconds: 3000, passwordChar: '*');
+showPasswordButton.BindCommand(showPassword);
+```
+
+The delay is specified in milliseconds and defaults to 5000; it must be positive. The masking character defaults to `'*'` and must not be `\0`. Mask the text box before the command is first executed. Execute on the text box's owning UI thread after its handle has been created, with a running WinForms message loop. While the command is executing, further invocations are ignored. When the delay ends or the command is cancelled, the text is masked with the configured character. The command disables `UseSystemPasswordChar` and does not restore the previous masking settings. Use one command per text box and do not change its masking settings while it is running. Cancellation and execution errors, including an invalid execution context or an already disposed text box, are reported through `ExecutionFailed`. If the text box is disposed during the delay, it is not accessed again.
+
 ### 3. UI Configuration (State & Drawing Types)
 
 ```csharp
